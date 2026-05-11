@@ -515,55 +515,67 @@
 
         <!-- 結果頁 -->
         <div id="page-result" class="page">
-            <div class="flex flex-col w-full h-full pt-12">
-                <div id="export-container" class="w-full p-2 flex-1 flex items-center">
-                    <div id="result-card" class="bg-white rounded-[32px] p-6 border-[4px] border-[#111] shadow-[8px_8px_0_#111] flex flex-col items-center text-center relative overflow-hidden max-h-full w-full">
+            <div class="flex flex-col w-full h-full pt-16 pb-12 gap-8">
+                
+                <!-- 1. 測驗結果卡片 (白底黑框) -->
+                <div id="export-container" class="w-full">
+                    <div id="result-card" class="bg-white rounded-[32px] p-6 border-[4px] border-[#111] shadow-[8px_8px_0_#111] flex flex-col items-center text-center relative overflow-hidden w-full">
                         <div class="inline-block bg-[#FFD306] border-[2px] border-[#111] text-[#111] text-sm font-black px-6 py-2 rounded-full mt-2 mb-4 shadow-[4px_4px_0_#111] transform -rotate-2 flex-shrink-0">
                             你的馬路神獸是
                         </div>
-                        <div class="overflow-y-auto w-full flex flex-col items-center px-1">
+                        <div class="w-full flex flex-col items-center px-1">
                             <div id="result-icon" class="text-7xl mb-2 drop-shadow-md">🐾</div>
                             <h2 id="result-title" class="text-3xl font-black text-[#111] mb-4 tracking-wide">結果標題</h2>
                             <div id="result-tags" class="flex gap-2 justify-center mb-6 flex-wrap px-2"></div>
-                            <div class="bg-white border-[3px] border-[#111] rounded-[20px] p-5 w-full text-left shadow-[4px_4px_0_#111] mb-4">
+                            <div class="bg-white border-[3px] border-[#111] rounded-[20px] p-5 w-full text-left shadow-[4px_4px_0_#111] mb-2">
                                 <p id="result-desc" class="text-[#111] font-bold text-sm leading-relaxed">結果詳細描述...</p>
                             </div>
-
-                            <!-- 新增：致敬交通從業人員區塊 (包含在截圖卡片內) -->
-                            <div class="w-full bg-[#00E5FF] border-[2px] border-[#111] rounded-[16px] p-3 mb-4 flex flex-col items-center shadow-[3px_3px_0_#111]">
-                                <p class="text-[#111] font-black text-[12px] mb-1 tracking-wide">❤️ 謝謝有你，讓道路更安全 ❤️</p>
-                                <p class="text-[#111] font-bold text-[10px]">115年交通局表揚大會｜向交通英雄致敬</p>
-                            </div>
                         </div>
-                        <div class="mt-auto pt-5 w-full flex justify-between items-center text-[10px] font-black text-[#111] border-t-[3px] border-dashed border-[#111] flex-shrink-0">
+                        <div class="mt-4 pt-5 w-full flex justify-between items-center text-[10px] font-black text-[#111] border-t-[3px] border-dashed border-[#111] flex-shrink-0">
                             <span>交通安全測驗</span>
                             <span id="current-date">2026.XX.XX</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 新增：引導至活動頁面的主視覺按鈕 -->
-                <div class="w-full px-4 mb-2 flex-shrink-0">
-                    <button onclick="showToast('將連結至表揚大會活動頁面！')" class="w-full py-3.5 bg-[#FF00FF] border-[3px] border-[#111] rounded-2xl shadow-[4px_4px_0_#111] flex items-center justify-center gap-2 active:translate-y-[2px] active:shadow-none text-white transition-transform hover:scale-[1.02]">
-                        <i class="ph-fill ph-hands-clapping text-xl"></i>
-                        <span class="text-base font-black tracking-widest">留言感謝交通英雄</span>
-                    </button>
-                </div>
-
-                <div class="w-full p-4 pt-2 flex justify-between gap-4 flex-shrink-0">
-                    <button onclick="restartQuiz()" class="flex-1 py-3 bg-white border-[3px] border-[#111] rounded-2xl shadow-[4px_4px_0_#111] flex flex-col items-center justify-center gap-1 active:translate-y-[2px] active:shadow-none">
+                <!-- 2. 再測一次、分享結果按鈕 -->
+                <div class="w-full flex justify-between gap-4">
+                    <button onclick="restartQuiz()" class="flex-1 py-4 bg-white border-[3px] border-[#111] rounded-2xl shadow-[4px_4px_0_#111] flex flex-col items-center justify-center gap-1 active:translate-y-[2px] active:shadow-none">
                         <i class="ph-bold ph-arrow-counter-clockwise text-xl"></i>
                         <span class="text-xs font-black">再測一次</span>
                     </button>
-                    <button onclick="showShareModal()" class="flex-1 py-3 bg-[#00E5FF] border-[3px] border-[#111] rounded-2xl shadow-[4px_4px_0_#111] flex flex-col items-center justify-center gap-1 active:translate-y-[2px] active:shadow-none text-[#111]">
+                    <button onclick="showShareModal()" class="flex-1 py-4 bg-[#00E5FF] border-[3px] border-[#111] rounded-2xl shadow-[4px_4px_0_#111] flex flex-col items-center justify-center gap-1 active:translate-y-[2px] active:shadow-none text-[#111]">
                         <i class="ph-bold ph-share-network text-xl"></i>
                         <span class="text-xs font-black">分享結果</span>
                     </button>
                 </div>
+
+                <!-- 3. 致敬交通英雄區塊 (白底黑框獨立區域) -->
+                <div class="w-full bg-white border-[4px] border-[#111] rounded-[32px] p-6 shadow-[8px_8px_0_#111] flex flex-col items-center text-center">
+                    <p class="text-[#111] font-black text-base mb-1 tracking-wide">❤️ 謝謝有你，讓道路更安全 ❤️</p>
+                    <p class="text-gray-500 font-bold text-xs mb-6">115年交通局表揚大會｜向交通英雄致敬</p>
+                    
+                    <button onclick="showToast('將連結至表揚大會活動頁面！')" class="w-full py-4 bg-[#FF00FF] border-[3px] border-[#111] rounded-2xl shadow-[4px_4px_0_#111] flex items-center justify-center gap-2 active:translate-y-[2px] active:shadow-none text-white transition-transform hover:scale-[1.02] mb-6">
+                        <i class="ph-fill ph-hands-clapping text-2xl"></i>
+                        <span class="text-base font-black tracking-widest">留言感謝交通英雄</span>
+                    </button>
+
+                    <!-- 新增：主視覺海報顯示區域 -->
+                    <div class="w-full">
+                        <div class="border-[4px] border-[#111] rounded-[24px] overflow-hidden shadow-[6px_6px_0_#111] bg-gray-50">
+                            <!-- 建議檔名：main-poster.jpg -->
+                            <img src="main-poster.jpg" alt="115年交通局表揚大會主視覺海報" class="w-full h-auto block" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'p-8 text-gray-400 font-bold text-sm italic\'>請放入主視覺海報 (main-poster.jpg)</div>'">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 底部緩衝空間 -->
+                <div class="h-10 w-full flex-shrink-0"></div>
+
             </div>
         </div>
 
-        <!-- 分享彈窗 (修正圖標形狀與文字對齊) -->
+        <!-- 分享彈窗 -->
         <div id="share-modal-overlay" onclick="closeShareModal()">
             <div id="share-modal" onclick="event.stopPropagation()">
                 <div class="flex justify-between items-center mb-6">
@@ -615,15 +627,12 @@
         const musicIcon = document.getElementById('music-icon');
         const body = document.getElementById('main-body');
 
-        // 音量優化
         clickSFX.volume = 1.0;
 
         function playMusic() {
             bgMusic.play().then(() => {
                 musicIcon.className = "ph-bold ph-speaker-high text-xl text-[#111]";
-            }).catch(e => {
-                console.log("自動播放暫時被攔截...");
-            });
+            }).catch(e => { console.log("自動播放暫時被攔截..."); });
         }
 
         function pauseMusic() {
@@ -638,15 +647,12 @@
 
         function playClickSFX() {
             clickSFX.currentTime = 0;
-            clickSFX.volume = 1.0;
             clickSFX.play().catch(e => {});
         }
 
-        // 音效預熱邏輯
         window.onload = function() {
             const initAudio = () => {
                 playMusic();
-                // 預熱點擊音效
                 clickSFX.play().then(() => { clickSFX.pause(); clickSFX.currentTime = 0; });
                 document.removeEventListener('click', initAudio);
                 document.removeEventListener('touchstart', initAudio);
@@ -660,24 +666,8 @@
             { q: "準備過馬路，<br>但斑馬線還有一小段距離？", options: [{ text: "抓準車流空隙，<br>直接切西瓜穿越", score: 0 }, { text: "看別人走就跟著走，<br>法不責眾嘛", score: 1 }, { text: "快步走到斑馬線，<br>但小跑步闖紅燈", score: 2 }, { text: "走到斑馬線，<br>並乖乖等綠燈才過", score: 3 }] },
             { q: "前方的車突然打錯方向燈<br>卻轉另一邊，你會？", options: [{ text: "狂按喇叭，<br>搖下車窗大罵", score: 0 }, { text: "嚇一跳急煞，<br>然後心裡瘋狂抱怨", score: 1 }, { text: "摸摸鼻子繞過去，<br>自認倒楣", score: 2 }, { text: "保持安全距離，<br>隨時準備應對突發狀況", score: 3 }] },
             { q: "朋友開車載你，<br>但他在車上一直滑手機，你會？", options: [{ text: "覺得沒差，<br>甚至湊過去一起看", score: 0 }, { text: "心裡很害怕，<br>但不敢說出來", score: 1 }, { text: "半開玩笑地說<br>「欸看路啦～」", score: 2 }, { text: "嚴肅制止他，<br>或主動幫他回訊息", score: 3 }] },
-            { 
-                q: "晚上走在沒有路燈的暗巷，<br>你會怎麼保護自己？", 
-                options: [
-                    { text: "穿一身黑，<br>融入夜色才酷", score: 0 }, 
-                    { text: "邊走邊滑手機，<br>螢幕光加減照", score: 1 }, 
-                    { text: "盡量走在路燈下，<br>腳步加快", score: 2 }, 
-                    { text: "穿亮色衣服或帶反光配件，<br>隨時注意來車", score: 3 }
-                ] 
-            },
-            {
-                q: "遇到在烈日下揮汗如雨、<br>指揮交通的警察或義交？",
-                options: [
-                    { text: "「快點讓我過啦，熱死了！」", score: 0 },
-                    { text: "無感路過，<br>反正跟我沒關係", score: 1 },
-                    { text: "心裡覺得他們很辛苦，<br>默默配合指揮", score: 2 },
-                    { text: "給個微笑或大聲說句：<br>「辛苦了！」", score: 3 }
-                ]
-            }
+            { q: "晚上走在沒有路燈的暗巷，<br>你會怎麼保護自己？", options: [{ text: "穿一身黑，<br>融入夜色才酷", score: 0 }, { text: "邊走邊滑手機，<br>螢幕光加減照", score: 1 }, { text: "盡量走在路燈下，<br>腳步加快", score: 2 }, { text: "穿亮色衣服或帶反光配件，<br>隨時注意來車", score: 3 }] },
+            { q: "遇到在烈日下揮汗如雨、<br>指揮交通的警察或義交？", options: [{ text: "「快點讓我過啦，熱死了！」", score: 0 }, { text: "無感路過，<br>反正跟我沒關係", score: 1 }, { text: "心裡覺得他們很辛苦，<br>默默配合指揮", score: 2 }, { text: "給個微笑或大聲說句：<br>「辛苦了！」", score: 3 }] }
         ];
 
         const resultsData = [
@@ -692,8 +682,7 @@
         ];
 
         let currentQuestionIndex = 0, totalScore = 0, currentResultTitle = "";
-        let isQuizStarting = false; // 防止重複點擊開始按鈕
-        let isOptionProcessing = false; // 防止連點選項
+        let isQuizStarting = false, isOptionProcessing = false;
 
         const showToast = (msg) => {
             const t = document.getElementById('toast');
@@ -716,80 +705,36 @@
             const burst = document.getElementById('pop-burst');
             burst.classList.add('active');
             body.classList.add('shake-active');
-            
-            // 當黃色圈圈放大遮住全畫面時 (約 350ms) 切換背景的頁面，這樣切換就完全不會被看到
             setTimeout(() => { if (callback) callback(); }, 350); 
-
-            // 等整個動畫(800ms)結束後再清理
-            setTimeout(() => { 
-                burst.classList.remove('active');
-                body.classList.remove('shake-active');
-            }, 850); 
+            setTimeout(() => { burst.classList.remove('active'); body.classList.remove('shake-active'); }, 850); 
         }
 
         function startTrafficLightCountdown(callback) {
             const overlay = document.getElementById('traffic-light-overlay');
             const lightRed = document.getElementById('light-red');
-            const lightYellow = document.getElementById('light-yellow');
             const lightGreen = document.getElementById('light-green');
             const pixelCounter = document.getElementById('pixel-counter');
-
             overlay.classList.add('active');
-            
-            // 重置燈號與文字
             lightRed.classList.remove('active');
-            lightYellow.classList.remove('active');
             lightGreen.classList.remove('active');
             pixelCounter.textContent = "";
-
-            // 確保音樂啟動
             if (bgMusic.paused) playMusic();
-
-            // 倒數 3 - 紅燈維持亮起
-            setTimeout(() => {
-                playClickSFX();
-                lightRed.classList.add('active');
-                pixelCounter.textContent = "3";
-            }, 100);
-
-            // 倒數 2 - 紅燈維持
-            setTimeout(() => {
-                playClickSFX();
-                pixelCounter.textContent = "2";
-            }, 1100);
-
-            // 倒數 1 - 紅燈維持
-            setTimeout(() => {
-                playClickSFX();
-                pixelCounter.textContent = "1";
-            }, 2100);
-
-            // 轉綠燈 (跳過黃燈)
-            setTimeout(() => {
-                playClickSFX();
-                lightRed.classList.remove('active');
-                lightGreen.classList.add('active');
-                pixelCounter.textContent = ""; // 燈號轉綠，清除數字
-            }, 3100);
-
-            // 隱藏紅綠燈，呼叫 GO 動畫
-            setTimeout(() => {
-                overlay.classList.remove('active');
-                callback();
-            }, 3500); // 讓綠燈稍微停留0.4秒，然後觸發GO!
+            setTimeout(() => { playClickSFX(); lightRed.classList.add('active'); pixelCounter.textContent = "3"; }, 100);
+            setTimeout(() => { playClickSFX(); pixelCounter.textContent = "2"; }, 1100);
+            setTimeout(() => { playClickSFX(); pixelCounter.textContent = "1"; }, 2100);
+            setTimeout(() => { playClickSFX(); lightRed.classList.remove('active'); lightGreen.classList.add('active'); pixelCounter.textContent = ""; }, 3100);
+            setTimeout(() => { overlay.classList.remove('active'); callback(); }, 3500);
         }
 
         function startQuiz() {
-            if (isQuizStarting) return; // 如果已經在啟動中，直接阻擋後續點擊
+            if (isQuizStarting) return;
             isQuizStarting = true;
-
             startTrafficLightCountdown(() => {
                 triggerPopBurst(() => {
-                    currentQuestionIndex = 0;
-                    totalScore = 0;
+                    currentQuestionIndex = 0; totalScore = 0;
                     switchPage(document.getElementById('page-home'), document.getElementById('page-quiz'));
                     renderQuestion(true);
-                    isQuizStarting = false; // 動畫結束，解除鎖定
+                    isQuizStarting = false;
                 });
             });
         }
@@ -804,10 +749,7 @@
             document.getElementById('progress-bar').style.width = `${(currentQuestionIndex / questions.length) * 100}%`;
             document.getElementById('question-counter').textContent = `${currentQuestionIndex + 1}/${questions.length}`;
             const quizCard = document.getElementById('quiz-card');
-            if (!isFirst) {
-                quizCard.style.opacity = 0;
-                setTimeout(updateContent, 200);
-            } else updateContent();
+            if (!isFirst) { quizCard.style.opacity = 0; setTimeout(updateContent, 200); } else updateContent();
 
             function updateContent() {
                 document.getElementById('question-text').innerHTML = `Q${currentQuestionIndex + 1}. ${qData.q}`;
@@ -820,32 +762,25 @@
                     btn.onclick = () => handleOptionClick(btn, opt.score);
                     container.appendChild(btn);
                 });
-                quizCard.style.opacity = 1;
-                isOptionProcessing = false; // 題目載入完成，開放點擊選項
+                quizCard.style.opacity = 1; isOptionProcessing = false;
             }
         }
 
         function handleOptionClick(btnElement, score) {
-            if (isOptionProcessing) return; // 防止多指觸控或狂點
-            isOptionProcessing = true;
-
-            playClickSFX();
+            if (isOptionProcessing) return;
+            isOptionProcessing = true; playClickSFX();
             document.querySelectorAll('.quiz-option').forEach(b => b.style.pointerEvents = 'none');
             btnElement.classList.add('selected');
             totalScore += score;
             setTimeout(() => {
                 currentQuestionIndex++;
                 if (currentQuestionIndex < questions.length) renderQuestion();
-                else {
-                    document.getElementById('progress-bar').style.width = `100%`;
-                    setTimeout(calculateAndShowResult, 200);
-                }
+                else { document.getElementById('progress-bar').style.width = `100%`; setTimeout(calculateAndShowResult, 200); }
             }, 300);
         }
 
         function calculateAndShowResult() {
-            isOptionProcessing = false; // 測驗結束，重置鎖定狀態
-            // 因為題目變成 6 題 (總分18)，稍微調整分數區間算法
+            isOptionProcessing = false;
             let resultIndex = Math.min(Math.floor(totalScore / 2.5), resultsData.length - 1);
             const result = resultsData[resultIndex];
             currentResultTitle = result.title;
@@ -859,8 +794,7 @@
             result.tags.forEach(tag => {
                 const span = document.createElement('span');
                 span.className = "px-3 py-1.5 bg-white border-[2px] border-[#111] text-[#111] rounded-full text-[10px] font-black shadow-[2px_2px_0_#111]";
-                span.textContent = `#${tag}`;
-                tagsContainer.appendChild(span);
+                span.textContent = `#${tag}`; tagsContainer.appendChild(span);
             });
             switchPage(document.getElementById('page-quiz'), document.getElementById('page-result'), true);
         }
@@ -869,10 +803,8 @@
             playClickSFX();
             document.getElementById('share-preview-title').textContent = `我的馬路神獸揭曉 - ${currentResultTitle}`;
             const overlay = document.getElementById('share-modal-overlay');
-            overlay.style.display = 'block';
-            void overlay.offsetWidth;
-            overlay.classList.add('active');
-            document.getElementById('share-modal').classList.add('active');
+            overlay.style.display = 'block'; void overlay.offsetWidth;
+            overlay.classList.add('active'); document.getElementById('share-modal').classList.add('active');
         }
 
         function closeShareModal() {
@@ -886,58 +818,23 @@
             playClickSFX();
             const shareText = `我剛測出我是【${currentResultTitle}】！你也來測測看你的交通安全屬性是哪種神獸吧！\n${window.location.href}`;
             const dummy = document.createElement('input');
-            document.body.appendChild(dummy);
-            dummy.value = shareText; dummy.select();
-            document.execCommand('copy');
-            document.body.removeChild(dummy);
-            showToast("✅ 測驗連結與結果已複製！");
-            closeShareModal();
+            document.body.appendChild(dummy); dummy.value = shareText; dummy.select();
+            document.execCommand('copy'); document.body.removeChild(dummy);
+            showToast("✅ 測驗連結與結果已複製！"); closeShareModal();
         }
 
         function shareSocial(platform) {
             playClickSFX();
-            // 由於 FB Sharer 主要是抓取網址，如果是開發環境(localhost/blob)，分享效果會受限
             const currentUrl = window.location.href;
-            const isLocal = currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1') || currentUrl.startsWith('blob:');
-            
             const url = encodeURIComponent(currentUrl);
             const text = encodeURIComponent(`我剛測出我是【${currentResultTitle}】！你也來測測看你的交通安全屬性是哪種神獸吧！`);
-            
             let shareUrl = "";
             switch(platform) {
-                case 'fb': 
-                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`; 
-                    if (isLocal) {
-                        showToast("⚠️ 偵測到本機環境，FB分享需在正式網址方可完整顯示圖文");
-                    }
-                    break;
-                case 'line': 
-                    shareUrl = `https://line.me/R/msg/text/?${text}%20${url}`; 
-                    break;
-                case 'threads': 
-                    shareUrl = `https://www.threads.net/intent/post?text=${text}%20${url}`; 
-                    break;
+                case 'fb': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`; break;
+                case 'line': shareUrl = `https://line.me/R/msg/text/?${text}%20${url}`; break;
+                case 'threads': shareUrl = `https://www.threads.net/intent/post?text=${text}%20${url}`; break;
             }
-            
-            if (shareUrl) {
-                // 判斷是否為行動裝置
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                
-                if (isMobile) {
-                    // 手機版：直接用連結開啟，避免彈出視窗阻擋
-                    const a = document.createElement('a');
-                    a.href = shareUrl;
-                    a.target = '_blank';
-                    a.rel = 'noopener noreferrer';
-                    a.click();
-                } else {
-                    // 電腦版：使用小視窗彈出
-                    const width = 600, height = 500;
-                    const left = (window.innerWidth - width) / 2;
-                    const top = (window.innerHeight - height) / 2;
-                    window.open(shareUrl, 'shareWindow', `width=${width},height=${height},left=${left},top=${top},toolbar=0,status=0`);
-                }
-            }
+            if (shareUrl) window.open(shareUrl, '_blank');
             closeShareModal();
         }
     </script>
