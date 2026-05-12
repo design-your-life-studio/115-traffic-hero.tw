@@ -797,8 +797,8 @@
             const resultImg = document.createElement('img');
             resultImg.src = result.icon;
             resultImg.alt = result.title;
-            // 透過 scale-[1.35] 直接放大 1.35 倍，讓圖片撐滿卡片邊界，並壓在文字底層
-            resultImg.className = "w-[95%] max-w-[400px] h-auto object-contain mx-auto transform scale-[1.35] my-4";
+            // 縮小約 10%：透過 scale-[1.25] 調整，讓圖片略小一點
+            resultImg.className = "w-[95%] max-w-[400px] h-auto object-contain mx-auto transform scale-[1.25] my-4";
             resultImg.onerror = function() {
                 this.style.display = 'none';
                 iconContainer.textContent = '圖標載入中...';
