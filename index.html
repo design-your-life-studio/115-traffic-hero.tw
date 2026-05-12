@@ -509,20 +509,28 @@
                 <!-- 1. 測驗結果卡片 -->
                 <div id="export-container" class="w-full">
                     <div id="result-card" class="bg-white rounded-[32px] px-6 pt-6 pb-4 border-[4px] border-[#111] shadow-[8px_8px_0_#111] flex flex-col items-center text-center relative overflow-hidden w-full">
-                        <div class="animate-bounce mt-2 mb-4 flex-shrink-0">
+                        
+                        <!-- 上方標籤：設定 z-20 讓它浮在塗鴉上方 -->
+                        <div class="animate-bounce mt-2 mb-2 flex-shrink-0 relative z-20">
                             <div class="inline-block bg-[#FFD306] border-[2px] border-[#111] text-[#111] text-sm font-black px-6 py-2 rounded-full shadow-[4px_4px_0_#111] transform -rotate-2">
                                 你的馬路神獸是
                             </div>
                         </div>
+                        
                         <div class="w-full flex flex-col items-center px-1">
-                            <div id="result-icon" class="mb-4 drop-shadow-md min-h-[192px] flex items-center justify-center overflow-hidden">🐾</div>
-                            <h2 id="result-title" class="text-3xl font-black text-[#111] mb-4 tracking-wide">結果標題</h2>
-                            <div id="result-tags" class="flex gap-2 justify-center mb-6 flex-wrap px-2"></div>
-                            <div class="bg-white border-[3px] border-[#111] rounded-[20px] p-5 w-full text-left shadow-[4px_4px_0_#111] mb-2">
+                            <!-- 塗鴉容器：設定 z-10 墊在底部，並使用負間距緊密貼合上下元素 -->
+                            <div id="result-icon" class="relative z-10 -mt-2 -mb-2 w-full flex items-center justify-center pointer-events-none drop-shadow-xl">🐾</div>
+                            
+                            <!-- 神獸標題：設定 z-20 浮在塗鴉上方，並將字體稍微加大 -->
+                            <h2 id="result-title" class="text-[32px] font-black text-[#111] mt-2 mb-4 tracking-wide relative z-20">結果標題</h2>
+                            
+                            <!-- 標籤與敘述區：設定 z-20 -->
+                            <div id="result-tags" class="flex gap-2 justify-center mb-6 flex-wrap px-2 relative z-20"></div>
+                            <div class="bg-white border-[3px] border-[#111] rounded-[20px] p-5 w-full text-left shadow-[4px_4px_0_#111] mb-2 relative z-20">
                                 <p id="result-desc" class="text-[#111] font-bold text-sm leading-relaxed">結果詳細描述...</p>
                             </div>
                         </div>
-                        <div class="mt-2 pt-3 w-full flex justify-between items-center text-[10px] font-black text-[#111] border-t-[3px] border-dashed border-[#111] flex-shrink-0">
+                        <div class="mt-2 pt-3 w-full flex justify-between items-center text-[10px] font-black text-[#111] border-t-[3px] border-dashed border-[#111] flex-shrink-0 relative z-20">
                             <span>交通安全測驗</span>
                             <span id="current-date">2026.XX.XX</span>
                         </div>
@@ -559,8 +567,7 @@
 
                     <div class="w-full">
                         <div class="border-[4px] border-[#111] rounded-[24px] overflow-hidden shadow-[6px_6px_0_#111] bg-gray-50 flex items-center justify-center min-h-[200px]">
-                            <!-- 更新海報載入路徑至 images 資料夾內 -->
-                            <img src="images/main-poster.jpg" alt="115年交通局表揚大會主視覺海報" class="w-full h-auto block" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;p-8 text-gray-400 font-bold text-sm italic&quot;>請放入主視覺海報 (images/main-poster.jpg)</div>'">
+                            <img src="main-poster.jpg" alt="115年交通局表揚大會主視覺海報" class="w-full h-auto block" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;p-8 text-gray-400 font-bold text-sm italic&quot;>請放入主視覺海報 (main-poster.jpg)</div>'">
                         </div>
                     </div>
                 </div>
@@ -790,7 +797,8 @@
             const resultImg = document.createElement('img');
             resultImg.src = result.icon;
             resultImg.alt = result.title;
-            resultImg.className = "w-48 h-48 object-contain mx-auto";
+            // 透過 scale-[1.35] 直接放大 1.35 倍，讓圖片撐滿卡片邊界，並壓在文字底層
+            resultImg.className = "w-[95%] max-w-[400px] h-auto object-contain mx-auto transform scale-[1.35] my-4";
             resultImg.onerror = function() {
                 this.style.display = 'none';
                 iconContainer.textContent = '圖標載入中...';
