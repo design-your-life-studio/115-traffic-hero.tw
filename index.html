@@ -975,7 +975,23 @@
             showPage.style.display = 'flex';
             void showPage.offsetWidth; 
             showPage.classList.add('active');
-            showPage.scrollTop = 0;
+            
+            // 如果不是結果頁，就回到最上方；如果是結果頁，則稍微往下捲動
+            if (!isResult) {
+                showPage.scrollTop = 0;
+            } else {
+                // 等待一下讓元素渲染完成，然後平滑捲動到剛好展示卡片主體的高度
+                setTimeout(() => {
+                    const resultCard = document.getElementById('result-card');
+                    if(resultCard) {
+                        // 捲動到卡片上方，並扣除一點距離(例如100px)讓頂部不會太貼齊邊緣
+                        showPage.scrollTo({
+                            top: resultCard.offsetTop - 100, 
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 100);
+            }
         };
 
         function triggerPopBurst(callback) {
