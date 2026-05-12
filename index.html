@@ -9,7 +9,7 @@
     <link rel="icon" href="favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
-    <!-- 社群分享縮圖標籤 (不影響頁面版面) -->
+    <!-- 社群分享縮圖標籤 -->
     <meta property="og:title" content="你是哪種馬路神獸？ | 交通安全測驗">
     <meta property="og:description" content="在車水馬龍的交通叢林中，你扮演著什麼樣的角色？只需 6 題，立刻測出你的道路安全屬性！">
     <meta property="og:image" content="share-preview.jpg">
@@ -139,7 +139,7 @@
             box-shadow: none;
         }
 
-        /* ================= 普普風爆裂動態效果 (含 GO!) ================= */
+        /* ================= 普普風爆裂動畫 (含 GO!) ================= */
         .pop-burst-overlay {
             position: fixed;
             top: 0;
@@ -415,7 +415,7 @@
             color: #FF3B30;
             text-shadow: 0 0 10px #FF3B30;
             line-height: 1;
-            padding-top: 4px; /* 微調像素字體的垂直對齊 */
+            padding-top: 4px; 
         }
     </style>
 </head>
@@ -450,7 +450,7 @@
 
     <div id="toast">提示訊息</div>
 
-    <!-- 頂端跑馬燈 (移至 app-container 外層，滿版顯示) -->
+    <!-- 頂端跑馬燈 -->
     <div class="marquee-bar">
         <div class="marquee-inner">
             <div class="marquee-content">✦115年交通局表揚大會✦ 探索你的馬路真實型態 ✦115年交通局表揚大會✦ 探索你的馬路真實型態 ✦115年交通局表揚大會✦ 探索你的馬路真實型態</div>
@@ -517,14 +517,14 @@
         <div id="page-result" class="page">
             <div class="flex flex-col w-full h-full pt-16 pb-12 gap-8">
                 
-                <!-- 1. 測驗結果卡片 (白底黑框) -->
+                <!-- 1. 測驗結果卡片 -->
                 <div id="export-container" class="w-full">
                     <div id="result-card" class="bg-white rounded-[32px] p-6 border-[4px] border-[#111] shadow-[8px_8px_0_#111] flex flex-col items-center text-center relative overflow-hidden w-full">
                         <div class="inline-block bg-[#FFD306] border-[2px] border-[#111] text-[#111] text-sm font-black px-6 py-2 rounded-full mt-2 mb-4 shadow-[4px_4px_0_#111] transform -rotate-2 flex-shrink-0">
                             你的馬路神獸是
                         </div>
                         <div class="w-full flex flex-col items-center px-1">
-                            <div id="result-icon" class="text-7xl mb-2 drop-shadow-md">🐾</div>
+                            <div id="result-icon" class="mb-2 drop-shadow-md min-h-[128px] flex items-center justify-center overflow-hidden">🐾</div>
                             <h2 id="result-title" class="text-3xl font-black text-[#111] mb-4 tracking-wide">結果標題</h2>
                             <div id="result-tags" class="flex gap-2 justify-center mb-6 flex-wrap px-2"></div>
                             <div class="bg-white border-[3px] border-[#111] rounded-[20px] p-5 w-full text-left shadow-[4px_4px_0_#111] mb-2">
@@ -550,7 +550,7 @@
                     </button>
                 </div>
 
-                <!-- 3. 致敬交通英雄區塊 (白底黑框獨立區域) -->
+                <!-- 3. 致敬交通英雄區塊 -->
                 <div class="w-full bg-white border-[4px] border-[#111] rounded-[32px] p-6 shadow-[8px_8px_0_#111] flex flex-col items-center text-center">
                     <p class="text-[#111] font-black text-base mb-1 tracking-wide">❤️ 謝謝有你，讓道路更安全 ❤️</p>
                     <p class="text-gray-500 font-bold text-xs mb-6">115年交通局表揚大會｜向交通英雄致敬</p>
@@ -559,18 +559,14 @@
                         <span class="text-base font-black tracking-widest">留言感謝交通英雄</span>
                     </button>
 
-                    <!-- 新增：主視覺海報顯示區域 -->
                     <div class="w-full">
-                        <div class="border-[4px] border-[#111] rounded-[24px] overflow-hidden shadow-[6px_6px_0_#111] bg-gray-50">
-                            <!-- 建議檔名：main-poster.jpg -->
-                            <img src="main-poster.jpg" alt="115年交通局表揚大會主視覺海報" class="w-full h-auto block" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'p-8 text-gray-400 font-bold text-sm italic\'>請放入主視覺海報 (main-poster.jpg)</div>'">
+                        <div class="border-[4px] border-[#111] rounded-[24px] overflow-hidden shadow-[6px_6px_0_#111] bg-gray-50 flex items-center justify-center min-h-[200px]">
+                            <img src="main-poster.jpg" alt="115年交通局表揚大會主視覺海報" class="w-full h-auto block" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;p-8 text-gray-400 font-bold text-sm italic&quot;>請放入主視覺海報 (main-poster.jpg)</div>'">
                         </div>
                     </div>
                 </div>
                 
-                <!-- 底部緩衝空間 -->
                 <div class="h-10 w-full flex-shrink-0"></div>
-
             </div>
         </div>
 
@@ -670,14 +666,14 @@
         ];
 
         const resultsData = [
-            { title: "暴走山道猴", icon: "🐒", tags: ["危險邊緣", "隨性駕駛", "無視規則"], desc: "馬路就是你的遊樂場！你常常憑直覺在路上移動，缺乏對交通規則的敬畏。為了自己和別人的安全，請多一點耐心，放慢腳步吧！" },
-            { title: "盲目跟風羊", icon: "🐑", tags: ["羊群效應", "缺乏主見", "僥倖心理"], desc: "「別人都在闖，我跟著走應該沒事吧？」你容易被周遭的用路人影響，忽略了潛在的危險。請記得，交通安全需要自己的獨立判斷！" },
-            { title: "暴躁噴火龍", icon: "🐉", tags: ["路怒症", "極度沒耐心", "按喇叭達人"], desc: "你對馬路上的三寶容忍度極低！只要別人稍微犯錯，你內心的火氣就會瞬間引爆。雖然你是對的，但深呼吸，保持情緒穩定更安全喔！" },
-            { title: "隨緣迷路鹿", icon: "🦌", tags: ["常常恍神", "天然呆", "過馬路靠運氣"], desc: "你走在路上常常靈魂出竅，思緒飄到九霄雲外。雖然你不是故意違規，但這種「天然呆」的用路方式其實危機四伏，過馬路要專心啦！" },
-            { title: "佛系慢吞龜", icon: "🐢", tags: ["安全第一", "烏龜車", "與世無爭"], desc: "你非常謹慎，寧可慢一點也不願冒險。這是很好的優點，但有時候過於緩慢或猶豫不決，反而會讓後方的車輛不知所措喔！" },
-            { title: "敏銳小狐獴", icon: "🦦", tags: ["東張西望", "高警覺性", "危險雷達"], desc: "你的交通安全雷達永遠開到最大！過馬路或騎車時總是眼觀四面、耳聽八方，隨時提防三寶出沒。你的防衛駕駛觀念非常優秀！" },
-            { title: "穩重護衛象", icon: "🐘", tags: ["遵守規則", "踏實安心", "禮讓行人"], desc: "你是優質用路人的典範！不僅嚴格遵守交通規則，還懂得互相禮讓。不管是開車還是走路，你都能為周遭帶來滿滿的安全感。" },
-            { title: "交通守護鷹", icon: "🦅", tags: ["完美防禦", "預判神人", "法規糾察隊"], desc: "太神啦！你擁有鷹眼般的觀察力與上帝視角，總能提早預判前方的危險並完美迴避。你是交通安全的守護神，路上有你真好！" }
+            { title: "暴走山道猴", icon: "beast-monkey.png", tags: ["危險邊緣", "隨性駕駛", "無視規則"], desc: "馬路就是你的遊樂場！你常常憑直覺在路上移動，缺乏對交通規則的敬畏。為了自己和別人的安全，請多一點耐心，放慢腳步吧！" },
+            { title: "盲目跟風羊", icon: "beast-sheep.png", tags: ["羊群效應", "缺乏主見", "僥倖心理"], desc: "「別人都在闖，我跟著走應該沒事吧？」你容易被周遭的用路人影響，忽略了潛在的危險。請記得，交通安全需要自己的獨立判斷！" },
+            { title: "暴躁噴火龍", icon: "beast-dragon.png", tags: ["路怒症", "極度沒耐心", "按喇叭達人"], desc: "你對馬路上的三寶容忍度極低！只要別人稍微犯錯，你內心的火氣就會瞬間引爆。雖然你是對的，但深呼吸，保持情緒穩定更安全喔！" },
+            { title: "隨緣迷路鹿", icon: "beast-deer.png", tags: ["常常恍神", "天然呆", "過馬路靠運氣"], desc: "你走在路上常常靈魂出竅，思緒飄到九霄雲外。雖然你不是故意違規，但這種「天然呆」的用路方式其實危機四伏，過馬路要專心啦！" },
+            { title: "佛系慢吞龜", icon: "beast-turtle.png", tags: ["安全第一", "烏龜車", "與世無爭"], desc: "你非常謹慎，寧可慢一點也不願冒險。這是很好的優點，但有時候過於緩慢或猶豫不決，反而會讓後方的車輛不知所措喔！" },
+            { title: "敏銳小狐獴", icon: "beast-meerkat.png", tags: ["東張西望", "高警覺性", "危險雷達"], desc: "你的交通安全雷達永遠開到最大！過馬路或騎車時總是眼觀四面、耳聽八方，隨時提防三寶出沒。你的防衛駕駛觀念非常優秀！" },
+            { title: "穩重護衛象", icon: "beast-elephant.png", tags: ["遵守規則", "踏實安心", "禮讓行人"], desc: "你是優質用路人的典範！不僅嚴格遵守交通規則，還懂得互相禮讓。不管是開車還是走路，你都能為周遭帶來滿滿的安全感。" },
+            { title: "交通守護鷹", icon: "beast-eagle.png", tags: ["完美防禦", "預判神人", "法規糾察隊"], desc: "太神啦！你擁有鷹眼般的觀察力與上帝視角，總能提早預判前方的危險並完美迴避。你是交通安全的守護神，路上有你真好！" }
         ];
 
         let currentQuestionIndex = 0, totalScore = 0, currentResultTitle = "";
@@ -783,7 +779,20 @@
             let resultIndex = Math.min(Math.floor(totalScore / 2.5), resultsData.length - 1);
             const result = resultsData[resultIndex];
             currentResultTitle = result.title;
-            document.getElementById('result-icon').textContent = result.icon;
+            
+            // 安全地處理圖標渲染，避免引號巢狀導致語法錯誤
+            const iconContainer = document.getElementById('result-icon');
+            iconContainer.innerHTML = '';
+            const resultImg = document.createElement('img');
+            resultImg.src = result.icon;
+            resultImg.alt = result.title;
+            resultImg.className = "w-32 h-32 object-contain mx-auto";
+            resultImg.onerror = function() {
+                this.style.display = 'none';
+                iconContainer.textContent = '圖標載入中...';
+            };
+            iconContainer.appendChild(resultImg);
+            
             document.getElementById('result-title').textContent = result.title;
             document.getElementById('result-desc').textContent = result.desc;
             const today = new Date();
