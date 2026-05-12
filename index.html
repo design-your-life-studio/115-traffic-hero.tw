@@ -656,17 +656,6 @@
             clickSFX.play().catch(e => {});
         }
 
-        window.onload = function() {
-            const initAudio = () => {
-                playMusic();
-                clickSFX.play().then(() => { clickSFX.pause(); clickSFX.currentTime = 0; });
-                document.removeEventListener('click', initAudio);
-                document.removeEventListener('touchstart', initAudio);
-            };
-            document.addEventListener('click', initAudio, { once: true });
-            document.addEventListener('touchstart', initAudio, { once: true });
-        };
-
         const questions = [
             { q: "上班路上趕時間，<br>遇到剛轉黃燈的紅綠燈，<br>你會怎麼做？", options: [{ text: "油門催到底，<br>衝過去再說！", score: 0 }, { text: "看左右沒警察，<br>偷偷溜過去", score: 1 }, { text: "猶豫一下，<br>最後還是急煞停下", score: 2 }, { text: "提早減速，<br>乖乖停在停止線後", score: 3 }] },
             { q: "準備過馬路，<br>但斑馬線還有一小段距離？", options: [{ text: "抓準車流空隙，<br>直接切西瓜穿越", score: 0 }, { text: "看別人走就跟著走，<br>法不責眾嘛", score: 1 }, { text: "快步走到斑馬線，<br>但小跑步闖紅燈", score: 2 }, { text: "走到斑馬線，<br>並乖乖等綠燈才過", score: 3 }] },
@@ -687,6 +676,30 @@
             { title: "穩重護衛象", icon: "images/beast-elephant.png", tags: ["遵守規則", "踏實安心", "禮讓行人"], desc: "你是優質用路人的典範！不僅嚴格遵守交通規則，還懂得互相禮讓。不管是開車還是走路，你都能為周遭帶來滿滿的安全感。" },
             { title: "交通守護鷹", icon: "images/beast-eagle.png", tags: ["完美防禦", "預判神人", "法規糾察隊"], desc: "太神啦！你擁有鷹眼般的觀察力與上帝視角，總能提早預判前方的危險並完美迴避。你是交通安全的守護神，路上有你真好！" }
         ];
+
+        // 預載圖片函數：將所有結果的圖片與海報預先下載到快取中
+        function preloadImages() {
+            resultsData.forEach(result => {
+                const img = new Image();
+                img.src = result.icon;
+            });
+            const posterImg = new Image();
+            posterImg.src = 'main-poster.jpg';
+        }
+
+        window.onload = function() {
+            const initAudio = () => {
+                playMusic();
+                clickSFX.play().then(() => { clickSFX.pause(); clickSFX.currentTime = 0; });
+                document.removeEventListener('click', initAudio);
+                document.removeEventListener('touchstart', initAudio);
+            };
+            document.addEventListener('click', initAudio, { once: true });
+            document.addEventListener('touchstart', initAudio, { once: true });
+            
+            // 頁面載入完成後立即開始預載圖片
+            preloadImages();
+        };
 
         let currentQuestionIndex = 0, totalScore = 0, currentResultTitle = "";
         let isQuizStarting = false, isOptionProcessing = false;
