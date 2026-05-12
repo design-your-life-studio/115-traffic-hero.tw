@@ -1072,9 +1072,9 @@
                 setTimeout(() => {
                     const resultCard = document.getElementById('result-card');
                     if(resultCard) {
-                        // 改為 + 0，讓畫面剛好對齊卡片頂端
+                        // 改為 - 50，稍微保留上方一點點空間
                         showPage.scrollTo({
-                            top: resultCard.offsetTop + 0, 
+                            top: resultCard.offsetTop - 50, 
                             behavior: 'smooth'
                         });
                     }
