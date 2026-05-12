@@ -11,7 +11,7 @@
 
     <!-- 社群分享縮圖標籤 -->
     <meta property="og:title" content="你是哪種馬路動物人格？ | 交通安全測驗">
-    <meta property="og:description" content="在車水馬龍的交通叢林中，你扮演著什麼樣的角色？只需 6 題，立刻測出你的馬路動物人格！">
+    <meta property="og:description" content="在車水馬龍的交通叢林中，你扮演著什麼樣的角色？只需6題，立刻測出你的馬路動物人格！">
     <meta property="og:image" content="share-preview.jpg">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
@@ -200,6 +200,11 @@
         }
         .floating-decor {
             animation: floatDecor 4s ease-in-out infinite;
+            cursor: grab; /* 增加滑鼠指標樣式 */
+            touch-action: none; /* 防止觸控螢幕預設滑動行為 */
+        }
+        .floating-decor:active {
+            cursor: grabbing;
         }
         .delay-1 { animation-delay: -1s; animation-duration: 5s; }
         .delay-2 { animation-delay: -2.5s; animation-duration: 4.5s; }
@@ -411,6 +416,16 @@
             line-height: 1;
             padding-top: 4px; 
         }
+
+        /* ================= 結果頁塗鴉動畫 ================= */
+        @keyframes resultDoodleFloat {
+            0%, 100% { transform: scale(1.25) translateY(0) rotate(-2deg); }
+            50% { transform: scale(1.25) translateY(-10px) rotate(2deg); }
+        }
+        .animate-result-doodle {
+            animation: resultDoodleFloat 3.5s ease-in-out infinite;
+            transform-origin: center center;
+        }
     </style>
 </head>
 <body id="main-body">
@@ -461,10 +476,10 @@
             </button>
             
             <!-- 首頁背景裝飾圖標 -->
-            <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-                <!-- 裝飾 1：紅綠燈 (左上) -->
-                <div class="floating-decor absolute top-[12%] left-[6%]">
-                    <div class="bg-[#333] border-[3px] border-[#111] rounded-[20px] p-2 flex flex-col gap-1.5 shadow-[4px_4px_0_#111] transform -rotate-12">
+            <div class="absolute inset-0 z-0 overflow-hidden" id="decor-container">
+                <!-- 裝飾 1：紅綠燈 -->
+                <div class="floating-decor absolute top-[10%] left-[10%]" id="decor-1">
+                    <div class="bg-[#333] border-[3px] border-[#111] rounded-[20px] p-2 flex flex-col gap-1.5 shadow-[4px_4px_0_#111] transform -rotate-12 pointer-events-none">
                         <div id="home-light-red" class="w-[18px] h-[18px] rounded-full bg-[#555] border-[2px] border-[#111] shadow-[inset_0_0_5px_rgba(0,0,0,0.8)] transition-all duration-300"></div>
                         <div id="home-light-yellow" class="w-[18px] h-[18px] rounded-full bg-[#555] border-[2px] border-[#111] shadow-[inset_0_0_5px_rgba(0,0,0,0.8)] transition-all duration-300"></div>
                         <div id="home-light-green" class="w-[18px] h-[18px] rounded-full bg-[#555] border-[2px] border-[#111] shadow-[inset_0_0_5px_rgba(0,0,0,0.8)] transition-all duration-300"></div>
@@ -474,49 +489,47 @@
                     </div>
                 </div>
 
-                <!-- 裝飾 2：速限標誌 (右上) -->
-                <div class="floating-decor delay-1 absolute top-[22%] right-[5%]">
-                    <div class="bg-white border-[3px] border-[#111] rounded-full w-[52px] h-[52px] flex items-center justify-center shadow-[4px_4px_0_#111] transform rotate-12">
+                <!-- 裝飾 2：速限標誌 -->
+                <div class="floating-decor delay-1 absolute top-[18%] right-[6%]" id="decor-2">
+                    <div class="bg-white border-[3px] border-[#111] rounded-full w-[52px] h-[52px] flex items-center justify-center shadow-[4px_4px_0_#111] transform rotate-12 pointer-events-none">
                         <div class="border-[4px] border-[#E63946] rounded-full w-[38px] h-[38px] flex items-center justify-center">
                             <span class="text-[#111] font-black text-[15px] leading-none mt-[2px]">50</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 裝飾 3：禁止進入標誌 (避開標題) -->
-                <div class="floating-decor delay-2 absolute top-[48%] left-[2%]">
-                    <div class="bg-[#E63946] border-[3px] border-[#111] rounded-full w-[46px] h-[46px] flex items-center justify-center shadow-[4px_4px_0_#111] transform -rotate-12">
+                <!-- 裝飾 3：禁止進入標誌 (左側，與「人格」對齊) -->
+                <div class="floating-decor delay-2 absolute top-[46%] left-[12%]" id="decor-3">
+                    <div class="bg-[#E63946] border-[3px] border-[#111] rounded-full w-[46px] h-[46px] flex items-center justify-center shadow-[4px_4px_0_#111] transform -rotate-12 pointer-events-none">
                         <div class="w-6 h-2 bg-white border-[2px] border-[#111] rounded-sm"></div>
                     </div>
                 </div>
 
-                <!-- 裝飾 4：注意警告標誌 (放大三角形框，避免與驚嘆號擠在一起) -->
-                <div class="floating-decor delay-3 absolute top-[52%] right-[2%]">
-                    <div class="bg-[#FFD306] border-[3px] border-[#111] rounded-[14px] w-[52px] h-[52px] flex items-center justify-center shadow-[5px_5px_0_#111] transform rotate-[15deg] overflow-hidden">
+                <!-- 裝飾 4：注意警告標誌 (右側，與「人格」對齊) -->
+                <div class="floating-decor delay-3 absolute top-[44%] right-[10%]" id="decor-4">
+                    <div class="bg-[#FFD306] border-[3px] border-[#111] rounded-[14px] w-[52px] h-[52px] flex items-center justify-center shadow-[5px_5px_0_#111] transform rotate-[15deg] overflow-hidden pointer-events-none">
                         <svg width="34" height="34" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- 放大後的圓角三角形外框 -->
                             <path d="M18 4 L4 29 H32 Z" stroke="#111" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
-                            <!-- 驚嘆號直線 -->
                             <line x1="18" y1="13" x2="18" y2="20" stroke="#111" stroke-width="3.5" stroke-linecap="round"/>
-                            <!-- 驚嘆號圓點 -->
                             <circle cx="18" cy="25" r="2" fill="#111"/>
                         </svg>
                     </div>
                 </div>
             </div>
 
-            <div class="flex flex-col items-center h-full pt-24 pb-10 relative z-10">
-                <div class="flex flex-col items-center w-full flex-grow justify-center">
-                    <div class="title-wrapper">
-                        <div class="title-sup">測測你是哪種</div>
-                        <h1 class="title-main">馬路動物<br><span class="text-[0.75em]">人格</span></h1>
+            <div class="flex flex-col items-center h-full pt-24 pb-10 relative z-10 pointer-events-none">
+                <div class="flex flex-col items-center w-full flex-grow justify-center pointer-events-none">
+                    
+                    <div class="title-wrapper cursor-grab active:cursor-grabbing touch-none pointer-events-auto" id="draggable-title">
+                        <div class="title-sup pointer-events-none">測測你是哪種</div>
+                        <h1 class="title-main pointer-events-none">馬路動物<br><span class="text-[0.75em]">人格</span></h1>
                     </div>
                     
-                    <div class="relative w-full max-w-[85%] mt-6 mb-4">
+                    <div class="relative w-full max-w-[85%] mt-6 mb-4 pointer-events-auto">
                         <div class="absolute inset-0 bg-[#0077B6] rounded-[28px] border-[4px] border-[#111] transform rotate-[4deg]"></div>
                         <div class="bg-white border-[4px] border-[#111] rounded-[28px] p-6 relative transform rotate-[-2deg] flex flex-col items-center shadow-[6px_6px_0_#111]">
                             <div class="w-10 h-2 bg-[#FFD306] border-[2px] border-[#111] rounded-full mb-4"></div>
-                            <p class="text-[#111] text-sm font-bold leading-loose text-center">
+                            <p class="text-[#111] text-sm font-bold leading-loose text-center pointer-events-none">
                                 在車水馬龍的交通叢林中，<br>
                                 你是三寶還是交通安全守護神？<br>
                                 只需 6 題，測出你的用路人屬性！
@@ -525,7 +538,7 @@
                     </div>
                 </div>
                 
-                <div class="w-full flex justify-center mt-auto pb-4">
+                <div class="w-full flex justify-center mt-auto pb-4 pointer-events-auto">
                     <button onclick="startQuiz()" class="px-8 py-3.5 rounded-[20px] bg-[#E63946] border-[4px] border-[#111] text-white font-black text-lg shadow-[7px_7px_0_#111] transform transition hover:scale-105 active:translate-y-[4px] active:translate-x-[4px] active:shadow-none flex items-center gap-3">
                         開始測驗 <i class="ph-fill ph-arrow-fat-right text-xl"></i>
                     </button>
@@ -711,6 +724,85 @@
             clickSFX.play().catch(e => {});
         }
 
+        // ================= 拖曳邏輯 =================
+        function makeDraggable(element) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            
+            // 對於觸控設備
+            element.addEventListener('touchstart', dragMouseDown, { passive: false });
+            // 對於滑鼠
+            element.addEventListener('mousedown', dragMouseDown);
+
+            function dragMouseDown(e) {
+                e.preventDefault();
+                
+                // 暫停原本的 CSS 漂浮動畫，避免拖曳時抖動
+                if (element.classList.contains('floating-decor')) {
+                    element.style.animation = 'none';
+                }
+
+                if (e.type === 'touchstart') {
+                    pos3 = e.touches[0].clientX;
+                    pos4 = e.touches[0].clientY;
+                } else {
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                }
+                
+                // 針對 absolute 與 relative 元件做不同的初始位置校正，防止跳動
+                const isAbsolute = window.getComputedStyle(element).position === 'absolute';
+                if (isAbsolute) {
+                    if (!element.style.top || !element.style.left) {
+                        element.style.top = element.offsetTop + 'px';
+                        element.style.left = element.offsetLeft + 'px';
+                        element.style.bottom = 'auto';
+                        element.style.right = 'auto';
+                    }
+                } else {
+                    if (!element.style.top) element.style.top = '0px';
+                    if (!element.style.left) element.style.left = '0px';
+                }
+
+                document.addEventListener('mouseup', closeDragElement);
+                document.addEventListener('mousemove', elementDrag);
+                document.addEventListener('touchend', closeDragElement);
+                document.addEventListener('touchmove', elementDrag, { passive: false });
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                
+                let clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+                let clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+
+                pos1 = pos3 - clientX;
+                pos2 = pos4 - clientY;
+                pos3 = clientX;
+                pos4 = clientY;
+
+                let newTop = parseFloat(element.style.top || 0) - pos2;
+                let newLeft = parseFloat(element.style.left || 0) - pos1;
+
+                element.style.top = newTop + "px";
+                element.style.left = newLeft + "px";
+            }
+
+            function closeDragElement() {
+                // 停止拖曳
+                document.removeEventListener('mouseup', closeDragElement);
+                document.removeEventListener('mousemove', elementDrag);
+                document.removeEventListener('touchend', closeDragElement);
+                document.removeEventListener('touchmove', elementDrag);
+                
+                // 放開後恢復漂浮動畫 (加上微小延遲讓 transition 順暢)
+                if (element.classList.contains('floating-decor')) {
+                    setTimeout(() => {
+                        element.style.animation = '';
+                    }, 50);
+                }
+            }
+        }
+
         const questions = [
             { q: "上班路上趕時間，<br>遇到剛轉黃燈的紅綠燈，<br>你會怎麼做？", options: [{ text: "油門催到底，<br>衝過去再說！", score: 0 }, { text: "看左右沒警察，<br>偷偷溜過去", score: 1 }, { text: "猶豫一下，<br>最後還是急煞停下", score: 2 }, { text: "提早減速，<br>乖乖停在停止線後", score: 3 }] },
             { q: "準備過馬路，<br>但斑馬線還有一小段距離？", options: [{ text: "抓準車流空隙，<br>直接切西瓜穿越", score: 0 }, { text: "看別人走就跟著走，<br>法不責眾嘛", score: 1 }, { text: "快步走到斑馬線，<br>但小跑步闖紅燈", score: 2 }, { text: "走到斑馬線，<br>並乖乖等綠燈才過", score: 3 }] },
@@ -720,6 +812,7 @@
             { q: "遇到在烈日下揮汗如雨、<br>指揮交通的警察或義交？", options: [{ text: "「快點讓我過啦，熱死了！」", score: 0 }, { text: "無感路過，<br>反正跟我沒關係", score: 1 }, { text: "心裡覺得他們很辛苦，<br>默默配合指揮", score: 2 }, { text: "給個微笑或大聲說句：<br>「辛苦了！」", score: 3 }] }
         ];
 
+        // 更新圖片讀取路徑至 images 資料夾
         const resultsData = [
             { title: "暴走山道猴", icon: "images/beast-monkey.png", tags: ["危險邊緣", "隨性駕駛", "無視規則"], desc: "馬路就是你的遊樂場！你常常憑直覺在路上移動，缺乏對交通規則的敬畏。為了自己和別人的安全，請多一點耐心，放慢腳步吧！" },
             { title: "盲目跟風羊", icon: "images/beast-sheep.png", tags: ["羊群效應", "缺乏主見", "僥倖心理"], desc: "「別人都在闖，我跟著走應該沒事吧？」你容易被周遭的用路人影響，忽略了潛在的危險。請記得，交通安全需要自己的獨立判斷！" },
@@ -752,6 +845,14 @@
             
             preloadImages();
             startHomeTrafficLight();
+            
+            // 初始化可拖曳物件
+            const decors = document.querySelectorAll('.floating-decor');
+            decors.forEach(decor => makeDraggable(decor));
+            
+            // 標題字也加入拖曳
+            const titleWrapper = document.getElementById('draggable-title');
+            if (titleWrapper) makeDraggable(titleWrapper);
         };
 
         let currentQuestionIndex = 0, totalScore = 0, currentResultTitle = "";
@@ -915,7 +1016,8 @@
             const resultImg = document.createElement('img');
             resultImg.src = result.icon;
             resultImg.alt = result.title;
-            resultImg.className = "w-[95%] max-w-[400px] h-auto object-contain mx-auto transform scale-[1.25] my-4";
+            // 套用新的動畫類別 animate-result-doodle，取代原本靜態的 transform scale
+            resultImg.className = "w-[95%] max-w-[400px] h-auto object-contain mx-auto my-4 animate-result-doodle";
             resultImg.onerror = function() {
                 this.style.display = 'none';
                 iconContainer.textContent = '圖標載入中...';
