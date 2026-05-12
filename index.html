@@ -11,7 +11,7 @@
 
     <!-- 社群分享縮圖標籤 -->
     <meta property="og:title" content="你是哪種馬路動物人格？ | 交通安全測驗">
-    <meta property="og:description" content="在車水馬龍的交通叢林中，你扮演著什麼樣的角色？只需 6 題，立刻測出你的馬路動物人格！">
+    <meta property="og:description" content="在車水馬龍的交通叢林中，你扮演著什麼樣的角色？只需6題，立刻測出你的馬路動物人格！">
     <meta property="og:image" content="share-preview.jpg">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
@@ -426,6 +426,50 @@
             animation: resultDoodleFloat 3.5s ease-in-out infinite;
             transform-origin: center center;
         }
+
+        /* 蓋章動畫 */
+        @keyframes stampEffect {
+            0% { transform: scale(3) rotate(-25deg); opacity: 0; }
+            50% { transform: scale(0.9) rotate(-15deg); opacity: 1; }
+            100% { transform: scale(1) rotate(-15deg); opacity: 1; }
+        }
+        .stamp-auth {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 80px;
+            height: 80px;
+            border: 4px solid #E63946;
+            border-radius: 50%;
+            color: #E63946;
+            font-weight: 900;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.1;
+            opacity: 0;
+            z-index: 30;
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.8) inset;
+            transform: rotate(-15deg);
+        }
+        .stamp-auth::after {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            border: 2px dashed #E63946;
+            border-radius: 50%;
+        }
+        .stamp-auth.animate {
+            animation: stampEffect 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation-delay: 0.8s; /* 延遲出現，增加儀式感 */
+        }
     </style>
 </head>
 <body id="main-body">
@@ -592,13 +636,14 @@
                         </div>
                         
                         <div class="w-full flex flex-col items-center px-1">
-                            <!-- 修正：將 margin bottom 調整為負值，大幅縮減塗鴉下方的留白空間 -->
-                            <div id="result-icon" class="relative z-10 w-full flex items-center justify-center pointer-events-none drop-shadow-xl -mt-2 -mb-6">🐾</div>
+                            <div id="result-icon" class="relative z-10 w-full flex items-center justify-center pointer-events-none drop-shadow-xl -mt-2 -mb-6">
+                                🐾
+                                <!-- 蓋章認證 -->
+                                <div id="stamp" class="stamp-auth">認證<br>完成</div>
+                            </div>
                             
-                            <!-- 修正：移除多餘的 margin top，讓標題更貼近上方的塗鴉 -->
                             <h2 id="result-title" class="text-[32px] font-black text-[#111] mt-0 mb-3 tracking-wide relative z-20">結果標題</h2>
                             
-                            <!-- 修正：縮小底部間距，讓排版更緊湊 -->
                             <div id="result-tags" class="flex gap-2 justify-center mb-4 flex-wrap px-2 relative z-20"></div>
                             
                             <div class="bg-white border-[3px] border-[#111] rounded-[20px] p-5 w-full text-left shadow-[4px_4px_0_#111] mb-1 relative z-20">
@@ -808,7 +853,7 @@
         }
 
         const questions = [
-            { q: "上班路上趕時間，<br>遇到剛轉黃燈的紅綠燈，<br>你會怎麼做？", options: [{ text: "油門催到底，<br>衝過去再說！", score: 0 }, { text: "看左右沒警察，<br>偷偷溜過去", score: 1 }, { text: "猶豫一下，<br>最後還是急煞停下", score: 2 }, { text: "提早減速，<br>乖乖停在停止線後", score: 3 }] },
+            { q: "上班路上趕時間，<br>遇到剛轉黃燈的紅綠燈，<br>你會怎麼做？", options: [{ text: "油門催到底，<br>衝過去再說！", score: 0 }, { text: "看左右沒警察，<br>偷偷溜過去", score: 1 }, { text: "猶豫一下，<br>最後還是急煞停下", score: 2 }, { text: "提早減速，<br>乖乖停解在停止線後", score: 3 }] },
             { q: "準備過馬路，<br>但斑馬線還有一小段距離？", options: [{ text: "抓準車流空隙，<br>直接切西瓜穿越", score: 0 }, { text: "看別人走就跟著走，<br>法不責眾嘛", score: 1 }, { text: "快步走到斑馬線，<br>但小跑步闖紅燈", score: 2 }, { text: "走到斑馬線，<br>並乖乖等綠燈才過", score: 3 }] },
             { q: "前方的車突然打錯方向燈<br>卻轉另一邊，你會？", options: [{ text: "狂按喇叭，<br>搖下車窗大罵", score: 0 }, { text: "嚇一跳急煞，<br>然後心裡瘋狂抱怨", score: 1 }, { text: "摸摸鼻子繞過去，<br>自認倒楣", score: 2 }, { text: "保持安全距離，<br>隨時準備應對突發狀況", score: 3 }] },
             { q: "朋友開車載你，<br>但他在車上一直滑手機，你會？", options: [{ text: "覺得沒差，<br>甚至湊過去一起看", score: 0 }, { text: "心裡很害怕，<br>但不敢說出來", score: 1 }, { text: "半開玩笑地說<br>「欸看路啦～」", score: 2 }, { text: "嚴肅制止他，<br>或主動幫他回訊息", score: 3 }] },
@@ -972,6 +1017,12 @@
         function restartQuiz() {
             playClickSFX();
             switchPage(document.querySelector('.page.active'), document.getElementById('page-home'));
+            
+            // 重置蓋章動畫
+            const stamp = document.getElementById('stamp');
+            if(stamp) {
+                stamp.classList.remove('animate');
+            }
         }
 
         function renderQuestion(isFirst = false) {
@@ -1017,6 +1068,7 @@
             
             const iconContainer = document.getElementById('result-icon');
             iconContainer.innerHTML = '';
+            
             const resultImg = document.createElement('img');
             resultImg.src = result.icon;
             resultImg.alt = result.title;
@@ -1027,6 +1079,13 @@
                 iconContainer.textContent = '圖標載入中...';
             };
             iconContainer.appendChild(resultImg);
+            
+            // 重新加入蓋章元素
+            const stampDiv = document.createElement('div');
+            stampDiv.id = 'stamp';
+            stampDiv.className = 'stamp-auth';
+            stampDiv.innerHTML = '認證<br>完成';
+            iconContainer.appendChild(stampDiv);
             
             document.getElementById('result-title').textContent = result.title;
             document.getElementById('result-desc').textContent = result.desc;
@@ -1040,6 +1099,14 @@
                 span.textContent = `#${tag}`; tagsContainer.appendChild(span);
             });
             switchPage(document.getElementById('page-quiz'), document.getElementById('page-result'), true);
+            
+            // 觸發蓋章動畫
+            setTimeout(() => {
+                const stamp = document.getElementById('stamp');
+                if(stamp) {
+                    stamp.classList.add('animate');
+                }
+            }, 100);
         }
 
         function showShareModal() {
