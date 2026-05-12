@@ -116,29 +116,6 @@
             100% { transform: translateX(-50%); }
         }
 
-        /* ================= 音樂控制按鈕 ================= */
-        #music-toggle {
-            position: absolute;
-            top: 120px; 
-            right: 20px;
-            width: 40px;
-            height: 40px;
-            background: white;
-            border: 3px solid #111;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 200;
-            cursor: pointer;
-            box-shadow: 3px 3px 0 #111;
-            transition: all 0.2s;
-        }
-        #music-toggle:active {
-            transform: translate(2px, 2px);
-            box-shadow: none;
-        }
-
         /* ================= 普普風爆裂動畫 (含 GO!) ================= */
         .pop-burst-overlay {
             position: fixed;
@@ -459,14 +436,14 @@
     </div>
 
     <div id="app-container">
-        <!-- 音樂控制開關 -->
-        <div id="music-toggle" onclick="toggleMusic()">
-            <i id="music-icon" class="ph-bold ph-speaker-slash text-xl text-[#111]"></i>
-        </div>
 
         <!-- 首頁 -->
-        <div id="page-home" class="page active">
-            <div class="flex flex-col items-center h-full pt-12 pb-10">
+        <div id="page-home" class="page active relative">
+            <button onclick="toggleMusic()" class="absolute top-[76px] right-5 w-10 h-10 bg-white border-[2px] border-[#111] rounded-full flex items-center justify-center z-50 cursor-pointer shadow-[2px_2px_0_#111] active:translate-y-[1px] active:shadow-none transition-all">
+                <i class="music-icon ph-bold ph-speaker-slash text-xl text-[#111]"></i>
+            </button>
+            <!-- 調整首頁主內容上距，避免與下移的喇叭重疊 -->
+            <div class="flex flex-col items-center h-full pt-24 pb-10">
                 <div class="inline-block px-5 py-1.5 rounded-full bg-white text-[#111] text-[11px] font-black tracking-[0.1em] mb-12 mt-4 border-2 border-[#111] shadow-sm">
                     DEMO測試中
                 </div>
@@ -494,14 +471,20 @@
         <!-- 測驗頁 -->
         <div id="page-quiz" class="page">
             <div class="flex flex-col h-full w-full">
-                <div class="w-full pt-12 pb-6 flex items-center justify-between">
-                    <button onclick="restartQuiz()" class="bg-white border-[2px] border-[#111] rounded-full p-2 shadow-[2px_2px_0_#111] active:translate-y-[1px] active:shadow-none">
-                        <i class="ph-bold ph-house text-2xl text-[#111]"></i>
+                <!-- 更新導覽列：透過 pt-14 (56px) 加上 page 預設的 20px padding，達成剛好 Top 76px，統一所有按鈕高度避開跑馬燈 -->
+                <div class="w-full pt-14 pb-6 flex items-center justify-between gap-3">
+                    <button onclick="restartQuiz()" class="w-10 h-10 bg-white border-[2px] border-[#111] rounded-full flex items-center justify-center shadow-[2px_2px_0_#111] active:translate-y-[1px] active:shadow-none flex-shrink-0">
+                        <i class="ph-bold ph-house text-xl text-[#111]"></i>
                     </button>
-                    <div class="flex-grow mx-4 relative h-4 bg-white border-[3px] border-[#111] rounded-full overflow-hidden shadow-[3px_3px_0_rgba(0,0,0,0.05)]">
+                    <div class="flex-grow relative h-4 bg-white border-[3px] border-[#111] rounded-full overflow-hidden shadow-[3px_3px_0_rgba(0,0,0,0.05)]">
                         <div id="progress-bar" class="absolute top-0 left-0 h-full bg-[#FF00FF] transition-all duration-300 w-0"></div>
                     </div>
-                    <span id="question-counter" class="text-sm font-black text-[#111] bg-white border-[2px] border-[#111] px-3 py-1 rounded-lg shadow-[2px_2px_0_#111]">1/6</span>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <span id="question-counter" class="text-sm font-black text-[#111] bg-white border-[2px] border-[#111] px-3 py-1 rounded-lg shadow-[2px_2px_0_#111]">1/6</span>
+                        <button onclick="toggleMusic()" class="w-10 h-10 bg-white border-[2px] border-[#111] rounded-full flex items-center justify-center shadow-[2px_2px_0_#111] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer">
+                            <i class="music-icon ph-bold ph-speaker-slash text-xl text-[#111]"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="flex-grow flex flex-col justify-center items-center w-full pb-10">
@@ -514,27 +497,42 @@
         </div>
 
         <!-- 結果頁 -->
-        <div id="page-result" class="page">
-            <div class="flex flex-col w-full h-full pt-16 pb-12 gap-8">
+        <div id="page-result" class="page relative">
+            <!-- 統一高度 Top 76px -->
+            <button onclick="toggleMusic()" class="absolute top-[76px] right-5 w-10 h-10 bg-white border-[2px] border-[#111] rounded-full flex items-center justify-center z-50 cursor-pointer shadow-[2px_2px_0_#111] active:translate-y-[1px] active:shadow-none transition-all">
+                <i class="music-icon ph-bold ph-speaker-slash text-xl text-[#111]"></i>
+            </button>
+            
+            <!-- 將 pt-24 調整為 pt-[120px] 讓白框起始高度與答題頁完全一致 -->
+            <div class="flex flex-col w-full h-full pt-[120px] pb-12 gap-8">
                 
                 <!-- 1. 測驗結果卡片 -->
                 <div id="export-container" class="w-full">
-                    <div id="result-card" class="bg-white rounded-[32px] p-6 border-[4px] border-[#111] shadow-[8px_8px_0_#111] flex flex-col items-center text-center relative overflow-hidden w-full">
-                        <div class="inline-block bg-[#FFD306] border-[2px] border-[#111] text-[#111] text-sm font-black px-6 py-2 rounded-full mt-2 mb-4 shadow-[4px_4px_0_#111] transform -rotate-2 flex-shrink-0">
-                            你的馬路神獸是
+                    <div id="result-card" class="bg-white rounded-[32px] px-6 pt-6 pb-4 border-[4px] border-[#111] shadow-[8px_8px_0_#111] flex flex-col items-center text-center relative overflow-hidden w-full">
+                        <div class="animate-bounce mt-2 mb-4 flex-shrink-0">
+                            <div class="inline-block bg-[#FFD306] border-[2px] border-[#111] text-[#111] text-sm font-black px-6 py-2 rounded-full shadow-[4px_4px_0_#111] transform -rotate-2">
+                                你的馬路神獸是
+                            </div>
                         </div>
                         <div class="w-full flex flex-col items-center px-1">
-                            <div id="result-icon" class="mb-2 drop-shadow-md min-h-[128px] flex items-center justify-center overflow-hidden">🐾</div>
+                            <div id="result-icon" class="mb-4 drop-shadow-md min-h-[192px] flex items-center justify-center overflow-hidden">🐾</div>
                             <h2 id="result-title" class="text-3xl font-black text-[#111] mb-4 tracking-wide">結果標題</h2>
                             <div id="result-tags" class="flex gap-2 justify-center mb-6 flex-wrap px-2"></div>
                             <div class="bg-white border-[3px] border-[#111] rounded-[20px] p-5 w-full text-left shadow-[4px_4px_0_#111] mb-2">
                                 <p id="result-desc" class="text-[#111] font-bold text-sm leading-relaxed">結果詳細描述...</p>
                             </div>
                         </div>
-                        <div class="mt-4 pt-5 w-full flex justify-between items-center text-[10px] font-black text-[#111] border-t-[3px] border-dashed border-[#111] flex-shrink-0">
+                        <div class="mt-2 pt-3 w-full flex justify-between items-center text-[10px] font-black text-[#111] border-t-[3px] border-dashed border-[#111] flex-shrink-0">
                             <span>交通安全測驗</span>
                             <span id="current-date">2026.XX.XX</span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- 向下捲動視覺引導 -->
+                <div class="w-full flex justify-center -my-3 pointer-events-none">
+                    <div class="animate-bounce bg-[#FFD306] border-[3px] border-[#111] rounded-full w-10 h-10 flex items-center justify-center shadow-[3px_3px_0_#111]">
+                        <i class="ph-bold ph-arrow-down text-[#111] text-xl"></i>
                     </div>
                 </div>
 
@@ -619,20 +617,25 @@
         // ================= 音樂與音效邏輯 =================
         const bgMusic = document.getElementById('bg-music');
         const clickSFX = document.getElementById('click-sfx');
-        const musicIcon = document.getElementById('music-icon');
         const body = document.getElementById('main-body');
 
         clickSFX.volume = 1.0;
 
         function playMusic() {
             bgMusic.play().then(() => {
-                musicIcon.className = "ph-bold ph-speaker-high text-xl text-[#111]";
+                document.querySelectorAll('.music-icon').forEach(icon => {
+                    icon.classList.remove('ph-speaker-slash');
+                    icon.classList.add('ph-speaker-high');
+                });
             }).catch(e => { console.log("自動播放暫時被攔截..."); });
         }
 
         function pauseMusic() {
             bgMusic.pause();
-            musicIcon.className = "ph-bold ph-speaker-slash text-xl text-[#111]";
+            document.querySelectorAll('.music-icon').forEach(icon => {
+                icon.classList.remove('ph-speaker-high');
+                icon.classList.add('ph-speaker-slash');
+            });
         }
 
         function toggleMusic() {
@@ -665,15 +668,16 @@
             { q: "遇到在烈日下揮汗如雨、<br>指揮交通的警察或義交？", options: [{ text: "「快點讓我過啦，熱死了！」", score: 0 }, { text: "無感路過，<br>反正跟我沒關係", score: 1 }, { text: "心裡覺得他們很辛苦，<br>默默配合指揮", score: 2 }, { text: "給個微笑或大聲說句：<br>「辛苦了！」", score: 3 }] }
         ];
 
+        // 更新圖片讀取路徑至 images 資料夾
         const resultsData = [
-            { title: "暴走山道猴", icon: "beast-monkey.png", tags: ["危險邊緣", "隨性駕駛", "無視規則"], desc: "馬路就是你的遊樂場！你常常憑直覺在路上移動，缺乏對交通規則的敬畏。為了自己和別人的安全，請多一點耐心，放慢腳步吧！" },
-            { title: "盲目跟風羊", icon: "beast-sheep.png", tags: ["羊群效應", "缺乏主見", "僥倖心理"], desc: "「別人都在闖，我跟著走應該沒事吧？」你容易被周遭的用路人影響，忽略了潛在的危險。請記得，交通安全需要自己的獨立判斷！" },
-            { title: "暴躁噴火龍", icon: "beast-dragon.png", tags: ["路怒症", "極度沒耐心", "按喇叭達人"], desc: "你對馬路上的三寶容忍度極低！只要別人稍微犯錯，你內心的火氣就會瞬間引爆。雖然你是對的，但深呼吸，保持情緒穩定更安全喔！" },
-            { title: "隨緣迷路鹿", icon: "beast-deer.png", tags: ["常常恍神", "天然呆", "過馬路靠運氣"], desc: "你走在路上常常靈魂出竅，思緒飄到九霄雲外。雖然你不是故意違規，但這種「天然呆」的用路方式其實危機四伏，過馬路要專心啦！" },
-            { title: "佛系慢吞龜", icon: "beast-turtle.png", tags: ["安全第一", "烏龜車", "與世無爭"], desc: "你非常謹慎，寧可慢一點也不願冒險。這是很好的優點，但有時候過於緩慢或猶豫不決，反而會讓後方的車輛不知所措喔！" },
-            { title: "敏銳小狐獴", icon: "beast-meerkat.png", tags: ["東張西望", "高警覺性", "危險雷達"], desc: "你的交通安全雷達永遠開到最大！過馬路或騎車時總是眼觀四面、耳聽八方，隨時提防三寶出沒。你的防衛駕駛觀念非常優秀！" },
-            { title: "穩重護衛象", icon: "beast-elephant.png", tags: ["遵守規則", "踏實安心", "禮讓行人"], desc: "你是優質用路人的典範！不僅嚴格遵守交通規則，還懂得互相禮讓。不管是開車還是走路，你都能為周遭帶來滿滿的安全感。" },
-            { title: "交通守護鷹", icon: "beast-eagle.png", tags: ["完美防禦", "預判神人", "法規糾察隊"], desc: "太神啦！你擁有鷹眼般的觀察力與上帝視角，總能提早預判前方的危險並完美迴避。你是交通安全的守護神，路上有你真好！" }
+            { title: "暴走山道猴", icon: "images/beast-monkey.png", tags: ["危險邊緣", "隨性駕駛", "無視規則"], desc: "馬路就是你的遊樂場！你常常憑直覺在路上移動，缺乏對交通規則的敬畏。為了自己和別人的安全，請多一點耐心，放慢腳步吧！" },
+            { title: "盲目跟風羊", icon: "images/beast-sheep.png", tags: ["羊群效應", "缺乏主見", "僥倖心理"], desc: "「別人都在闖，我跟著走應該沒事吧？」你容易被周遭的用路人影響，忽略了潛在的危險。請記得，交通安全需要自己的獨立判斷！" },
+            { title: "暴躁噴火龍", icon: "images/beast-dragon.png", tags: ["路怒症", "極度沒耐心", "按喇叭達人"], desc: "你對馬路上的三寶容忍度極低！只要別人稍微犯錯，你內心的火氣就會瞬間引爆。雖然你是對的，但深呼吸，保持情緒穩定更安全喔！" },
+            { title: "隨緣迷路鹿", icon: "images/beast-deer.png", tags: ["常常恍神", "天然呆", "過馬路靠運氣"], desc: "你走在路上常常靈魂出竅，思緒飄到九霄雲外。雖然你不是故意違規，但這種「天然呆」的用路方式其實危機四伏，過馬路要專心啦！" },
+            { title: "佛系慢吞龜", icon: "images/beast-turtle.png", tags: ["安全第一", "烏龜車", "與世無爭"], desc: "你非常謹慎，寧可慢一點也不願冒險。這是很好的優點，但有時候過於緩慢或猶豫不決，反而會讓後方的車輛不知所措喔！" },
+            { title: "敏銳小狐獴", icon: "images/beast-meerkat.png", tags: ["東張西望", "高警覺性", "危險雷達"], desc: "你的交通安全雷達永遠開到最大！過馬路或騎車時總是眼觀四面、耳聽八方，隨時提防三寶出沒。你的防衛駕駛觀念非常優秀！" },
+            { title: "穩重護衛象", icon: "images/beast-elephant.png", tags: ["遵守規則", "踏實安心", "禮讓行人"], desc: "你是優質用路人的典範！不僅嚴格遵守交通規則，還懂得互相禮讓。不管是開車還是走路，你都能為周遭帶來滿滿的安全感。" },
+            { title: "交通守護鷹", icon: "images/beast-eagle.png", tags: ["完美防禦", "預判神人", "法規糾察隊"], desc: "太神啦！你擁有鷹眼般的觀察力與上帝視角，總能提早預判前方的危險並完美迴避。你是交通安全的守護神，路上有你真好！" }
         ];
 
         let currentQuestionIndex = 0, totalScore = 0, currentResultTitle = "";
@@ -780,13 +784,12 @@
             const result = resultsData[resultIndex];
             currentResultTitle = result.title;
             
-            // 安全地處理圖標渲染，避免引號巢狀導致語法錯誤
             const iconContainer = document.getElementById('result-icon');
             iconContainer.innerHTML = '';
             const resultImg = document.createElement('img');
             resultImg.src = result.icon;
             resultImg.alt = result.title;
-            resultImg.className = "w-32 h-32 object-contain mx-auto";
+            resultImg.className = "w-48 h-48 object-contain mx-auto";
             resultImg.onerror = function() {
                 this.style.display = 'none';
                 iconContainer.textContent = '圖標載入中...';
