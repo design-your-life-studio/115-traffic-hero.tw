@@ -462,12 +462,19 @@
             
             <!-- 首頁背景裝飾圖標 (放置於底層) -->
             <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-                <!-- 裝飾 1：紅綠燈 -->
-                <div class="floating-decor absolute top-[15%] left-[8%]">
-                    <div class="bg-gray-800 border-[3px] border-[#111] rounded-full p-2 flex flex-col gap-1.5 shadow-[4px_4px_0_#111] transform -rotate-12">
-                        <div class="w-3 h-3 bg-[#FF3B30] border-[2px] border-[#111] rounded-full shadow-inner"></div>
-                        <div class="w-3 h-3 bg-[#FFD306] border-[2px] border-[#111] rounded-full shadow-inner"></div>
-                        <div class="w-3 h-3 bg-[#00FF00] border-[2px] border-[#111] rounded-full shadow-inner"></div>
+                <!-- 裝飾 1：紅綠燈 (倒數動畫同款樣式，加上 ID 供 JS 控制) -->
+                <div class="floating-decor absolute top-[14%] left-[6%]">
+                    <div class="bg-[#333] border-[3px] border-[#111] rounded-[20px] p-2 flex flex-col gap-1.5 shadow-[4px_4px_0_#111] transform -rotate-12">
+                        <!-- 紅燈 -->
+                        <div id="home-light-red" class="w-[18px] h-[18px] rounded-full bg-[#555] border-[2px] border-[#111] shadow-[inset_0_0_5px_rgba(0,0,0,0.8)] transition-all duration-300"></div>
+                        <!-- 黃燈 -->
+                        <div id="home-light-yellow" class="w-[18px] h-[18px] rounded-full bg-[#555] border-[2px] border-[#111] shadow-[inset_0_0_5px_rgba(0,0,0,0.8)] transition-all duration-300"></div>
+                        <!-- 綠燈 -->
+                        <div id="home-light-green" class="w-[18px] h-[18px] rounded-full bg-[#555] border-[2px] border-[#111] shadow-[inset_0_0_5px_rgba(0,0,0,0.8)] transition-all duration-300"></div>
+                        <!-- 倒數燈格 -->
+                        <div class="w-[18px] h-[18px] rounded-full bg-[#222] border-[2px] border-[#111] shadow-[inset_0_0_5px_rgba(0,0,0,0.8)] flex items-center justify-center overflow-hidden">
+                            <span id="home-light-counter" class="text-[#FF3B30] font-black text-[10px] transform scale-75" style="font-family: 'Press Start 2P', monospace; text-shadow: 0 0 3px #FF3B30; margin-top: 1px;"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -537,6 +544,7 @@
         <!-- 測驗頁 -->
         <div id="page-quiz" class="page">
             <div class="flex flex-col h-full w-full">
+                <!-- 更新導覽列：透過 pt-14 (56px) 加上 page 預設的 20px padding，達成剛好 Top 76px，統一所有按鈕高度避開跑馬燈 -->
                 <div class="w-full pt-14 pb-6 flex items-center justify-between gap-3">
                     <button onclick="restartQuiz()" class="w-10 h-10 bg-white border-[2px] border-[#111] rounded-full flex items-center justify-center shadow-[2px_2px_0_#111] active:translate-y-[1px] active:shadow-none flex-shrink-0">
                         <i class="ph-bold ph-house text-xl text-[#111]"></i>
@@ -727,6 +735,7 @@
             { q: "遇到在烈日下揮汗如雨、<br>指揮交通的警察或義交？", options: [{ text: "「快點讓我過啦，熱死了！」", score: 0 }, { text: "無感路過，<br>反正跟我沒關係", score: 1 }, { text: "心裡覺得他們很辛苦，<br>默默配合指揮", score: 2 }, { text: "給個微笑或大聲說句：<br>「辛苦了！」", score: 3 }] }
         ];
 
+        // 更新圖片讀取路徑至 images 資料夾
         const resultsData = [
             { title: "暴走山道猴", icon: "images/beast-monkey.png", tags: ["危險邊緣", "隨性駕駛", "無視規則"], desc: "馬路就是你的遊樂場！你常常憑直覺在路上移動，缺乏對交通規則的敬畏。為了自己和別人的安全，請多一點耐心，放慢腳步吧！" },
             { title: "盲目跟風羊", icon: "images/beast-sheep.png", tags: ["羊群效應", "缺乏主見", "僥倖心理"], desc: "「別人都在闖，我跟著走應該沒事吧？」你容易被周遭的用路人影響，忽略了潛在的危險。請記得，交通安全需要自己的獨立判斷！" },
@@ -738,6 +747,7 @@
             { title: "交通守護鷹", icon: "images/beast-eagle.png", tags: ["完美防禦", "預判神人", "法規糾察隊"], desc: "太神啦！你擁有鷹眼般的觀察力與上帝視角，總能提早預判前方的危險並完美迴避。你是交通安全的守護神，路上有你真好！" }
         ];
 
+        // 預載圖片函數：將所有結果的圖片與海報預先下載到快取中
         function preloadImages() {
             resultsData.forEach(result => {
                 const img = new Image();
@@ -757,11 +767,75 @@
             document.addEventListener('click', initAudio, { once: true });
             document.addEventListener('touchstart', initAudio, { once: true });
             
+            // 頁面載入完成後立即開始預載圖片
             preloadImages();
+            // 啟動首頁紅綠燈動畫
+            startHomeTrafficLight();
         };
 
         let currentQuestionIndex = 0, totalScore = 0, currentResultTitle = "";
         let isQuizStarting = false, isOptionProcessing = false;
+
+        // ================= 首頁紅綠燈動畫邏輯 =================
+        let homeLightInterval;
+        let homeCountdownInterval;
+
+        function startHomeTrafficLight() {
+            const redLight = document.getElementById('home-light-red');
+            const yellowLight = document.getElementById('home-light-yellow');
+            const greenLight = document.getElementById('home-light-green');
+            const counterText = document.getElementById('home-light-counter');
+            
+            // 定義燈號狀態：紅 -> 綠 -> 黃
+            const states = ['red', 'green', 'yellow'];
+            let currentStateIndex = 0;
+            let currentCountdown = 5;
+
+            function updateLights() {
+                // 重置所有燈號樣式
+                redLight.className = "w-[18px] h-[18px] rounded-full bg-[#555] border-[2px] border-[#111] shadow-[inset_0_0_5px_rgba(0,0,0,0.8)] transition-all duration-300";
+                yellowLight.className = "w-[18px] h-[18px] rounded-full bg-[#555] border-[2px] border-[#111] shadow-[inset_0_0_5px_rgba(0,0,0,0.8)] transition-all duration-300";
+                greenLight.className = "w-[18px] h-[18px] rounded-full bg-[#555] border-[2px] border-[#111] shadow-[inset_0_0_5px_rgba(0,0,0,0.8)] transition-all duration-300";
+                
+                const state = states[currentStateIndex];
+                
+                // 點亮當前燈號並設定數字顏色
+                if (state === 'red') {
+                    redLight.className = "w-[18px] h-[18px] rounded-full bg-[#FF3B30] border-[2px] border-[#111] shadow-[0_0_12px_#FF3B30,inset_0_0_2px_rgba(255,255,255,0.5)] transition-all duration-300";
+                    counterText.style.color = "#FF3B30";
+                    counterText.style.textShadow = "0 0 3px #FF3B30";
+                } else if (state === 'green') {
+                    greenLight.className = "w-[18px] h-[18px] rounded-full bg-[#00FF00] border-[2px] border-[#111] shadow-[0_0_12px_#00FF00,inset_0_0_2px_rgba(255,255,255,0.5)] transition-all duration-300";
+                    counterText.style.color = "#00FF00";
+                    counterText.style.textShadow = "0 0 3px #00FF00";
+                } else if (state === 'yellow') {
+                    yellowLight.className = "w-[18px] h-[18px] rounded-full bg-[#FFD306] border-[2px] border-[#111] shadow-[0_0_12px_#FFD306,inset_0_0_2px_rgba(255,255,255,0.5)] transition-all duration-300";
+                    counterText.style.color = "#FFD306";
+                    counterText.style.textShadow = "0 0 3px #FFD306";
+                }
+            }
+
+            function updateCountdown() {
+                if (currentCountdown <= 0) {
+                    currentStateIndex = (currentStateIndex + 1) % states.length;
+                    const nextState = states[currentStateIndex];
+                    // 黃燈設定為 3 秒，紅綠燈維持 5 秒
+                    currentCountdown = (nextState === 'yellow') ? 3 : 5;
+                    updateLights();
+                }
+                
+                counterText.textContent = currentCountdown;
+                currentCountdown--;
+            }
+
+            // 初始化第一次狀態
+            updateLights();
+            updateCountdown();
+
+            // 每秒更新倒數
+            clearInterval(homeCountdownInterval);
+            homeCountdownInterval = setInterval(updateCountdown, 1000);
+        }
 
         const showToast = (msg) => {
             const t = document.getElementById('toast');
@@ -869,6 +943,7 @@
             const resultImg = document.createElement('img');
             resultImg.src = result.icon;
             resultImg.alt = result.title;
+            // 縮小約 10%：透過 scale-[1.25] 調整，讓圖片略小一點
             resultImg.className = "w-[95%] max-w-[400px] h-auto object-contain mx-auto transform scale-[1.25] my-4";
             resultImg.onerror = function() {
                 this.style.display = 'none';
