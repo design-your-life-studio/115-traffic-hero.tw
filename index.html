@@ -663,8 +663,9 @@
                     <button onclick="restartQuiz()" class="w-10 h-10 bg-white border-[2px] border-[#111] rounded-full flex items-center justify-center shadow-[2px_2px_0_#111] active:translate-y-[1px] active:shadow-none flex-shrink-0">
                         <i class="ph-bold ph-house text-xl text-[#111]"></i>
                     </button>
-                    <div class="flex-grow relative h-4 bg-white border-[3px] border-[#111] rounded-full overflow-hidden shadow-[3px_3px_0_rgba(0,0,0,0.05)]">
-                        <div id="progress-bar" class="absolute top-0 left-0 h-full bg-[#E63946] transition-all duration-300 w-0"></div>
+                    <!-- 修正進度條的圓角與 iOS 裁切白邊問題 -->
+                    <div class="flex-grow relative h-4 bg-white border-[3px] border-[#111] rounded-full overflow-hidden shadow-[3px_3px_0_rgba(0,0,0,0.05)] z-0" style="-webkit-mask-image: -webkit-radial-gradient(white, black);">
+                        <div id="progress-bar" class="absolute top-0 -left-1 h-full bg-[#E63946] transition-all duration-300 rounded-full" style="width: 4px;"></div>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
                         <span id="question-counter" class="text-sm font-black text-[#111] bg-white border-[2px] border-[#111] px-3 py-1 rounded-lg shadow-[2px_2px_0_#111]">1/6</span>
@@ -944,7 +945,7 @@
         const questions = [
             { q: "上班路上趕時間，<br>遇到剛轉黃燈的紅綠燈，<br>你會怎麼做？", options: [{ text: "油門催到底，<br>衝過去再說！", score: 0 }, { text: "看左右沒警察，<br>偷偷溜過去", score: 1 }, { text: "猶豫一下，<br>最後還是急煞停下", score: 2 }, { text: "提早減速，<br>乖乖停解在停止線後", score: 3 }] },
             { q: "準備過馬路，<br>但斑馬線還有一小段距離？", options: [{ text: "抓準車流空隙，<br>直接切西瓜穿越", score: 0 }, { text: "看別人走就跟著走，<br>法不責眾嘛", score: 1 }, { text: "快步走到斑馬線，<br>但小跑步闖紅燈", score: 2 }, { text: "走到斑馬線，<br>並乖乖等綠燈才過", score: 3 }] },
-            { q: "前方的車突然打錯方向燈<br>卻轉另一邊，你會？", options: [{ text: "狂按喇叭，<br>搖下車窗大罵", score: 0 }, { text: "嚇一跳急煞，<br>然後心裡瘋狂抱怨", score: 1 }, { text: "摸摸鼻子繞過去，<br>自認倒楣", score: 2 }, { text: "保持安全距離，<br>隨時準備應對突發狀況", score: 3 }] },
+            { q: "前方的車突然打錯方向燈<br>卻轉另一邊，你會？", options: [{ text: "狂按喇叭，<br>搖下車窗大罵", score: 0 }, { text: "嚇一跳急煞，<br>然後心裡瘋狂抱怨", score: 1 }, { text: "摸摸鼻子繞過去，<br>自認倒楣", score: 2 }, { text: "保持安全距離，<br>隨時準備應通突發狀況", score: 3 }] },
             { q: "朋友開車載你，<br>但他在車上一直滑手機，你會？", options: [{ text: "覺得沒差，<br>甚至湊過去一起看", score: 0 }, { text: "心裡很害怕，<br>但不敢說出來", score: 1 }, { text: "半開玩笑地說<br>「欸看路啦～」", score: 2 }, { text: "嚴肅制止他，<br>或主動幫他回訊息", score: 3 }] },
             { q: "晚上走在沒有路燈的暗巷，<br>你會怎麼保護自己？", options: [{ text: "穿一身黑，<br>融入夜色才酷", score: 0 }, { text: "邊走邊滑手機，<br>螢幕光加減照", score: 1 }, { text: "盡量走在路燈下，<br>腳步加快", score: 2 }, { text: "穿亮色衣服或帶反光配件，<br>隨時注意來車", score: 3 }] },
             { q: "遇到在烈日下揮汗如雨、<br>指揮交通的警察或義交？", options: [{ text: "「快點讓我過啦，熱死了！」", score: 0 }, { text: "無感路過，<br>反正跟我沒關係", score: 1 }, { text: "心裡覺得他們很辛苦，<br>默默配合指揮", score: 2 }, { text: "給個微笑或大聲說句：<br>「辛苦了！」", score: 3 }] }
@@ -1133,7 +1134,8 @@
 
         function renderQuestion(isFirst = false) {
             const qData = questions[currentQuestionIndex];
-            document.getElementById('progress-bar').style.width = `${(currentQuestionIndex / questions.length) * 100}%`;
+            // 更新進度條，加上 4px 補償左側的 -left-1 偏移
+            document.getElementById('progress-bar').style.width = `calc(${(currentQuestionIndex / questions.length) * 100}% + 4px)`;
             document.getElementById('question-counter').textContent = `${currentQuestionIndex + 1}/${questions.length}`;
             const quizCard = document.getElementById('quiz-card');
             if (!isFirst) { quizCard.style.opacity = 0; setTimeout(updateContent, 200); } else updateContent();
@@ -1162,7 +1164,10 @@
             setTimeout(() => {
                 currentQuestionIndex++;
                 if (currentQuestionIndex < questions.length) renderQuestion();
-                else { document.getElementById('progress-bar').style.width = `100%`; setTimeout(calculateAndShowResult, 200); }
+                else { 
+                    document.getElementById('progress-bar').style.width = `calc(100% + 4px)`; 
+                    setTimeout(calculateAndShowResult, 200); 
+                }
             }, 300);
         }
 
