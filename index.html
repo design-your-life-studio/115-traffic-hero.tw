@@ -810,105 +810,141 @@
     <script>
         // ================= 音樂與音效邏輯 =================
         // ================= 背景音樂引擎：原創 8-bit「街頭普普」 =================
-        // 用 Web Audio 即時合成，不需要音檔、無版權問題、可無縫循環
+        // 載入時先用 OfflineAudioContext 把配樂合成為 WAV，再交給一般 <audio> 播放：
+        // 1. 不需要另外放音檔  2. 不受 iPhone 靜音開關影響  3. 手機解鎖方式與一般音樂相同
         const bgMusic = (() => {
             const Q = { maj7:[0,4,7,11], min7:[0,3,7,10], dom7:[0,4,7,10] };
             const N = null;
             const T = {
-                bpm: 104, swing: .12, masterVol: .35,
+                bpm: 104, swing: .12, masterVol: .5,
                 prog: [[62,'min7'],[67,'dom7'],[60,'maj7'],[69,'dom7']],
                 arp:  [N,N,3,N, 2,N,N,1, N,3,N,2, N,N,1,N],
                 bass: [0,N,N,0, N,N,10,12, N,0,N,N, 7,N,10,N],
                 kick: 'x.....x...x.....', snare: '....x.......x..x', hat: 'x.x.x.x.x.x.x.x.'
             };
-            let ctx = null, master, noiseBuf, pulse, timer = null, step = 0, nextTime = 0;
+            const SR = 44100;
+            const spb = 60 / T.bpm / 4;
+            const totalSteps = 16 * T.prog.length;
+            const loopLen = totalSteps * spb;
             const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
 
-            function init() {
-                if (ctx) return;
-                ctx = new (window.AudioContext || window.webkitAudioContext)();
-                master = ctx.createGain();
+            const audio = new Audio();
+            audio.loop = true;
+            audio.preload = 'auto';
+            audio.setAttribute('playsinline', '');
+            let ready = false, wantPlay = false, waiters = [];
+
+            function renderLoop() {
+                const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+                if (!OAC) return Promise.reject(new Error('不支援音訊合成'));
+                const renderLen = loopLen + 0.6; // 多算一段尾音，之後疊回開頭做無縫循環
+                const ctx = new OAC(1, Math.ceil(renderLen * SR), SR);
+                const master = ctx.createGain();
                 master.gain.value = T.masterVol;
                 master.connect(ctx.destination);
-                noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
-                const d = noiseBuf.getChannelData(0);
-                for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+
+                const noiseBuf = ctx.createBuffer(1, SR, SR);
+                const nd = noiseBuf.getChannelData(0);
+                for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
                 const real = new Float32Array(64), imag = new Float32Array(64);
                 for (let k = 1; k < 64; k++) real[k] = (2 / (k * Math.PI)) * Math.sin(k * Math.PI * .5);
-                pulse = ctx.createPeriodicWave(real, imag);
-            }
-            function tone(midi, t, len, vol, tri) {
-                const o = ctx.createOscillator(), g = ctx.createGain();
-                if (tri) o.type = 'triangle'; else o.setPeriodicWave(pulse);
-                o.frequency.value = mtof(midi);
-                g.gain.setValueAtTime(0, t);
-                g.gain.linearRampToValueAtTime(vol, t + .005);
-                g.gain.exponentialRampToValueAtTime(.0008, t + len);
-                o.connect(g).connect(master);
-                o.start(t); o.stop(t + len + .02);
-            }
-            function noise(t, len, vol, type, freq) {
-                const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
-                s.buffer = noiseBuf; f.type = type; f.frequency.value = freq;
-                g.gain.setValueAtTime(vol, t);
-                g.gain.exponentialRampToValueAtTime(.001, t + len);
-                s.connect(f).connect(g).connect(master);
-                s.start(t); s.stop(t + len + .02);
-            }
-            function kick(t, vol) {
-                const o = ctx.createOscillator(), g = ctx.createGain();
-                o.frequency.setValueAtTime(150, t);
-                o.frequency.exponentialRampToValueAtTime(40, t + .12);
-                g.gain.setValueAtTime(vol, t);
-                g.gain.exponentialRampToValueAtTime(.001, t + .18);
-                o.connect(g).connect(master);
-                o.start(t); o.stop(t + .2);
-            }
-            function playStep(st, t) {
-                const spb = 60 / T.bpm / 4, s = st % 16;
-                const [root, q] = T.prog[Math.floor(st / 16) % T.prog.length];
-                const tones = Q[q].map(x => root + x);
-                if (T.arp[s] !== null) tone(tones[T.arp[s]], t, spb * 1.2, .10, false);
-                if (T.bass[s] !== null) tone(root - 24 + T.bass[s], t, spb * 1.6, .36, true);
-                if (T.kick[s] === 'x') kick(t, .7);
-                if (T.snare[s] === 'x') noise(t, .14, .28, 'bandpass', 1800);
-                if (T.hat[s] === 'x') noise(t, .04, .10, 'highpass', 7000);
-            }
-            function schedule() {
-                const spb = 60 / T.bpm / 4;
-                while (nextTime < ctx.currentTime + .12) {
-                    playStep(step, nextTime + (step % 2 ? T.swing * spb : 0));
-                    nextTime += spb;
-                    step = (step + 1) % (16 * T.prog.length);
+                const pulse = ctx.createPeriodicWave(real, imag);
+
+                const tone = (midi, t, len, vol, tri) => {
+                    const o = ctx.createOscillator(), g = ctx.createGain();
+                    if (tri) o.type = 'triangle'; else o.setPeriodicWave(pulse);
+                    o.frequency.value = mtof(midi);
+                    g.gain.setValueAtTime(0, t);
+                    g.gain.linearRampToValueAtTime(vol, t + .005);
+                    g.gain.exponentialRampToValueAtTime(.0008, t + len);
+                    o.connect(g); g.connect(master);
+                    o.start(t); o.stop(t + len + .02);
+                };
+                const noise = (t, len, vol, type, freq) => {
+                    const src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+                    src.buffer = noiseBuf; f.type = type; f.frequency.value = freq;
+                    g.gain.setValueAtTime(vol, t);
+                    g.gain.exponentialRampToValueAtTime(.001, t + len);
+                    src.connect(f); f.connect(g); g.connect(master);
+                    src.start(t); src.stop(t + len + .02);
+                };
+                const kick = (t, vol) => {
+                    const o = ctx.createOscillator(), g = ctx.createGain();
+                    o.frequency.setValueAtTime(150, t);
+                    o.frequency.exponentialRampToValueAtTime(40, t + .12);
+                    g.gain.setValueAtTime(vol, t);
+                    g.gain.exponentialRampToValueAtTime(.001, t + .18);
+                    o.connect(g); g.connect(master);
+                    o.start(t); o.stop(t + .2);
+                };
+
+                for (let st = 0; st < totalSteps; st++) {
+                    const t = st * spb + (st % 2 ? T.swing * spb : 0) + .001;
+                    const s = st % 16;
+                    const [root, q] = T.prog[Math.floor(st / 16)];
+                    const tones = Q[q].map(x => root + x);
+                    if (T.arp[s] !== null) tone(tones[T.arp[s]], t, spb * 1.2, .10, false);
+                    if (T.bass[s] !== null) tone(root - 24 + T.bass[s], t, spb * 1.6, .36, true);
+                    if (T.kick[s] === 'x') kick(t, .7);
+                    if (T.snare[s] === 'x') noise(t, .14, .28, 'bandpass', 1800);
+                    if (T.hat[s] === 'x') noise(t, .04, .10, 'highpass', 7000);
                 }
+
+                return new Promise((resolve, reject) => {
+                    ctx.oncomplete = e => resolve(e.renderedBuffer); // 舊版 Safari
+                    const p = ctx.startRendering();
+                    if (p && p.then) p.then(resolve, reject);
+                });
             }
+
+            function toWavBlob(buffer) {
+                const loopSamples = Math.round(loopLen * SR);
+                const src = buffer.getChannelData(0);
+                const data = new Float32Array(loopSamples);
+                for (let i = 0; i < src.length; i++) data[i % loopSamples] += src[i]; // 尾音疊回開頭
+                const out = new DataView(new ArrayBuffer(44 + loopSamples * 2));
+                const str = (o, s) => { for (let i = 0; i < s.length; i++) out.setUint8(o + i, s.charCodeAt(i)); };
+                str(0, 'RIFF'); out.setUint32(4, 36 + loopSamples * 2, true); str(8, 'WAVE');
+                str(12, 'fmt '); out.setUint32(16, 16, true); out.setUint16(20, 1, true); out.setUint16(22, 1, true);
+                out.setUint32(24, SR, true); out.setUint32(28, SR * 2, true); out.setUint16(32, 2, true); out.setUint16(34, 16, true);
+                str(36, 'data'); out.setUint32(40, loopSamples * 2, true);
+                for (let i = 0; i < loopSamples; i++) {
+                    const v = Math.max(-1, Math.min(1, data[i]));
+                    out.setInt16(44 + i * 2, v < 0 ? v * 0x8000 : v * 0x7FFF, true);
+                }
+                return new Blob([out], { type: 'audio/wav' });
+            }
+
+            renderLoop().then(buf => {
+                audio.src = URL.createObjectURL(toWavBlob(buf));
+                audio.load();
+                ready = true;
+                const list = waiters; waiters = [];
+                list.forEach(fn => fn());
+            }).catch(err => console.log('背景音樂合成失敗：', err));
 
             const api = {
-                paused: true,
+                get paused() { return audio.paused; },
                 play() {
-                    init();
-                    return ctx.resume().then(() => {
-                        if (ctx.state !== 'running') throw new Error('音訊尚未解鎖');
-                        if (api.paused) {
-                            api.paused = false;
-                            nextTime = ctx.currentTime + .06;
-                            clearInterval(timer);
-                            timer = setInterval(schedule, 25);
-                        }
+                    wantPlay = true;
+                    if (ready) return audio.play();
+                    // 還在合成中：完成後再嘗試播放
+                    return new Promise((resolve, reject) => {
+                        waiters.push(() => { if (wantPlay) audio.play().then(resolve, reject); else reject(); });
                     });
                 },
-                pause() {
-                    api.paused = true;
-                    clearInterval(timer); timer = null;
-                    if (ctx) ctx.suspend();
-                }
+                pause() { wantPlay = false; audio.pause(); }
             };
 
-            // 切到其他分頁或 App 時暫停，回來時自動續播，避免背景播放斷斷續續
+            // 切到其他分頁或 App 時暫停，回來時自動續播
+            let pausedByHidden = false;
             document.addEventListener('visibilitychange', () => {
-                if (!ctx || api.paused) return;
-                if (document.hidden) { clearInterval(timer); timer = null; ctx.suspend(); }
-                else ctx.resume().then(() => { nextTime = ctx.currentTime + .06; clearInterval(timer); timer = setInterval(schedule, 25); });
+                if (document.hidden) {
+                    if (!audio.paused) { audio.pause(); pausedByHidden = true; }
+                } else if (pausedByHidden) {
+                    pausedByHidden = false;
+                    audio.play().catch(() => {});
+                }
             });
             return api;
         })();
@@ -1077,12 +1113,13 @@
         window.onload = function() {
             const initAudio = () => {
                 playMusic();
-                clickSFX.play().then(() => { clickSFX.pause(); clickSFX.currentTime = 0; });
+                clickSFX.play().then(() => { clickSFX.pause(); clickSFX.currentTime = 0; }).catch(() => {});
                 document.removeEventListener('click', initAudio);
-                document.removeEventListener('touchstart', initAudio);
+                document.removeEventListener('touchend', initAudio);
             };
+            // 手機需在「點擊完成」時才算使用者授權，因此改用 touchend 而非 touchstart
             document.addEventListener('click', initAudio, { once: true });
-            document.addEventListener('touchstart', initAudio, { once: true });
+            document.addEventListener('touchend', initAudio, { once: true });
             
             preloadImages();
             startHomeTrafficLight();
