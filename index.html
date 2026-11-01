@@ -10,13 +10,15 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
     <!-- 社群分享縮圖標籤 -->
+    <!-- ⚠️ 上線前請把下方所有「https://你的網域/」換成網站實際網址（例如 https://帳號.github.io/專案名稱/） -->
+    <meta property="og:url" content="https://你的網域/traffic.html">
     <meta property="og:title" content="你是哪種馬路動物人格？ | 交通安全測驗">
     <meta property="og:description" content="在車水馬龍的交通叢林中，你扮演著什麼樣的角色？只需6題，立刻測出你的馬路動物人格！">
-    <meta property="og:image" content="share-preview.jpg">
+    <meta property="og:image" content="https://你的網域/share-preview.jpg">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="share-preview.jpg">
-    <link rel="image_src" href="share-preview.jpg">
+    <meta name="twitter:image" content="https://你的網域/share-preview.jpg">
+    <link rel="image_src" href="https://你的網域/share-preview.jpg">
     
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -557,10 +559,7 @@
         </div>
     </div>
 
-    <!-- 背景音樂音軌 -->
-    <audio id="bg-music" loop preload="auto">
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3" type="audio/mpeg">
-    </audio>
+    <!-- 背景音樂：改用程式即時合成的原創 8-bit 配樂「街頭普普」(見 script 內 BGM 引擎) -->
 
     <!-- 一般按鈕點擊音效 -->
     <audio id="click-sfx" preload="auto">
@@ -810,7 +809,109 @@
 
     <script>
         // ================= 音樂與音效邏輯 =================
-        const bgMusic = document.getElementById('bg-music');
+        // ================= 背景音樂引擎：原創 8-bit「街頭普普」 =================
+        // 用 Web Audio 即時合成，不需要音檔、無版權問題、可無縫循環
+        const bgMusic = (() => {
+            const Q = { maj7:[0,4,7,11], min7:[0,3,7,10], dom7:[0,4,7,10] };
+            const N = null;
+            const T = {
+                bpm: 104, swing: .12, masterVol: .35,
+                prog: [[62,'min7'],[67,'dom7'],[60,'maj7'],[69,'dom7']],
+                arp:  [N,N,3,N, 2,N,N,1, N,3,N,2, N,N,1,N],
+                bass: [0,N,N,0, N,N,10,12, N,0,N,N, 7,N,10,N],
+                kick: 'x.....x...x.....', snare: '....x.......x..x', hat: 'x.x.x.x.x.x.x.x.'
+            };
+            let ctx = null, master, noiseBuf, pulse, timer = null, step = 0, nextTime = 0;
+            const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+
+            function init() {
+                if (ctx) return;
+                ctx = new (window.AudioContext || window.webkitAudioContext)();
+                master = ctx.createGain();
+                master.gain.value = T.masterVol;
+                master.connect(ctx.destination);
+                noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+                const d = noiseBuf.getChannelData(0);
+                for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+                const real = new Float32Array(64), imag = new Float32Array(64);
+                for (let k = 1; k < 64; k++) real[k] = (2 / (k * Math.PI)) * Math.sin(k * Math.PI * .5);
+                pulse = ctx.createPeriodicWave(real, imag);
+            }
+            function tone(midi, t, len, vol, tri) {
+                const o = ctx.createOscillator(), g = ctx.createGain();
+                if (tri) o.type = 'triangle'; else o.setPeriodicWave(pulse);
+                o.frequency.value = mtof(midi);
+                g.gain.setValueAtTime(0, t);
+                g.gain.linearRampToValueAtTime(vol, t + .005);
+                g.gain.exponentialRampToValueAtTime(.0008, t + len);
+                o.connect(g).connect(master);
+                o.start(t); o.stop(t + len + .02);
+            }
+            function noise(t, len, vol, type, freq) {
+                const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+                s.buffer = noiseBuf; f.type = type; f.frequency.value = freq;
+                g.gain.setValueAtTime(vol, t);
+                g.gain.exponentialRampToValueAtTime(.001, t + len);
+                s.connect(f).connect(g).connect(master);
+                s.start(t); s.stop(t + len + .02);
+            }
+            function kick(t, vol) {
+                const o = ctx.createOscillator(), g = ctx.createGain();
+                o.frequency.setValueAtTime(150, t);
+                o.frequency.exponentialRampToValueAtTime(40, t + .12);
+                g.gain.setValueAtTime(vol, t);
+                g.gain.exponentialRampToValueAtTime(.001, t + .18);
+                o.connect(g).connect(master);
+                o.start(t); o.stop(t + .2);
+            }
+            function playStep(st, t) {
+                const spb = 60 / T.bpm / 4, s = st % 16;
+                const [root, q] = T.prog[Math.floor(st / 16) % T.prog.length];
+                const tones = Q[q].map(x => root + x);
+                if (T.arp[s] !== null) tone(tones[T.arp[s]], t, spb * 1.2, .10, false);
+                if (T.bass[s] !== null) tone(root - 24 + T.bass[s], t, spb * 1.6, .36, true);
+                if (T.kick[s] === 'x') kick(t, .7);
+                if (T.snare[s] === 'x') noise(t, .14, .28, 'bandpass', 1800);
+                if (T.hat[s] === 'x') noise(t, .04, .10, 'highpass', 7000);
+            }
+            function schedule() {
+                const spb = 60 / T.bpm / 4;
+                while (nextTime < ctx.currentTime + .12) {
+                    playStep(step, nextTime + (step % 2 ? T.swing * spb : 0));
+                    nextTime += spb;
+                    step = (step + 1) % (16 * T.prog.length);
+                }
+            }
+
+            const api = {
+                paused: true,
+                play() {
+                    init();
+                    return ctx.resume().then(() => {
+                        if (ctx.state !== 'running') throw new Error('音訊尚未解鎖');
+                        if (api.paused) {
+                            api.paused = false;
+                            nextTime = ctx.currentTime + .06;
+                            clearInterval(timer);
+                            timer = setInterval(schedule, 25);
+                        }
+                    });
+                },
+                pause() {
+                    api.paused = true;
+                    clearInterval(timer); timer = null;
+                    if (ctx) ctx.suspend();
+                }
+            };
+
+            // 切到其他分頁或 App 時暫停，回來時自動續播，避免背景播放斷斷續續
+            document.addEventListener('visibilitychange', () => {
+                if (!ctx || api.paused) return;
+                if (document.hidden) { clearInterval(timer); timer = null; ctx.suspend(); }
+                else ctx.resume().then(() => { nextTime = ctx.currentTime + .06; clearInterval(timer); timer = setInterval(schedule, 25); });
+            });
+            return api;
+        })();
         const clickSFX = document.getElementById('click-sfx');
         const body = document.getElementById('main-body');
 
@@ -943,9 +1044,9 @@
         }
 
         const questions = [
-            { q: "上班路上趕時間，<br>遇到剛轉黃燈的紅綠燈，<br>你會怎麼做？", options: [{ text: "油門催到底，<br>衝過去再說！", score: 0 }, { text: "看左右沒警察，<br>偷偷溜過去", score: 1 }, { text: "猶豫一下，<br>最後還是急煞停下", score: 2 }, { text: "提早減速，<br>乖乖停解在停止線後", score: 3 }] },
+            { q: "上班路上趕時間，<br>遇到剛轉黃燈的紅綠燈，<br>你會怎麼做？", options: [{ text: "油門催到底，<br>衝過去再說！", score: 0 }, { text: "看左右沒警察，<br>偷偷溜過去", score: 1 }, { text: "猶豫一下，<br>最後還是急煞停下", score: 2 }, { text: "提早減速，<br>乖乖停在停止線後", score: 3 }] },
             { q: "準備過馬路，<br>但斑馬線還有一小段距離？", options: [{ text: "抓準車流空隙，<br>直接切西瓜穿越", score: 0 }, { text: "看別人走就跟著走，<br>法不責眾嘛", score: 1 }, { text: "快步走到斑馬線，<br>但小跑步闖紅燈", score: 2 }, { text: "走到斑馬線，<br>並乖乖等綠燈才過", score: 3 }] },
-            { q: "前方的車突然打錯方向燈<br>卻轉另一邊，你會？", options: [{ text: "狂按喇叭，<br>搖下車窗大罵", score: 0 }, { text: "嚇一跳急煞，<br>然後心裡瘋狂抱怨", score: 1 }, { text: "摸摸鼻子繞過去，<br>自認倒楣", score: 2 }, { text: "保持安全距離，<br>隨時準備應通突發狀況", score: 3 }] },
+            { q: "前方的車突然打錯方向燈<br>卻轉另一邊，你會？", options: [{ text: "狂按喇叭，<br>搖下車窗大罵", score: 0 }, { text: "嚇一跳急煞，<br>然後心裡瘋狂抱怨", score: 1 }, { text: "摸摸鼻子繞過去，<br>自認倒楣", score: 2 }, { text: "保持安全距離，<br>隨時準備應變突發狀況", score: 3 }] },
             { q: "朋友開車載你，<br>但他在車上一直滑手機，你會？", options: [{ text: "覺得沒差，<br>甚至湊過去一起看", score: 0 }, { text: "心裡很害怕，<br>但不敢說出來", score: 1 }, { text: "半開玩笑地說<br>「欸看路啦～」", score: 2 }, { text: "嚴肅制止他，<br>或主動幫他回訊息", score: 3 }] },
             { q: "晚上走在沒有路燈的暗巷，<br>你會怎麼保護自己？", options: [{ text: "穿一身黑，<br>融入夜色才酷", score: 0 }, { text: "邊走邊滑手機，<br>螢幕光加減照", score: 1 }, { text: "盡量走在路燈下，<br>腳步加快", score: 2 }, { text: "穿亮色衣服或帶反光配件，<br>隨時注意來車", score: 3 }] },
             { q: "遇到在烈日下揮汗如雨、<br>指揮交通的警察或義交？", options: [{ text: "「快點讓我過啦，熱死了！」", score: 0 }, { text: "無感路過，<br>反正跟我沒關係", score: 1 }, { text: "心裡覺得他們很辛苦，<br>默默配合指揮", score: 2 }, { text: "給個微笑或大聲說句：<br>「辛苦了！」", score: 3 }] }
@@ -1238,10 +1339,30 @@
         function copyResultLink() {
             playClickSFX();
             const shareText = `我剛測出我的馬路動物人格是【${currentResultTitle}】！你也來測測看你在馬路上的真實型態吧！\n${window.location.href}`;
-            const dummy = document.createElement('input');
-            document.body.appendChild(dummy); dummy.value = shareText; dummy.select();
-            document.execCommand('copy'); document.body.removeChild(dummy);
-            showToast("✅ 測驗連結與結果已複製！"); closeShareModal();
+            const onSuccess = () => { showToast("✅ 測驗連結與結果已複製！"); closeShareModal(); };
+            const onFail = () => { showToast("❌ 複製失敗，請手動複製網址"); closeShareModal(); };
+
+            // 舊方法備援（用 textarea 保留換行，並避免 iOS 跳出鍵盤與畫面縮放）
+            const fallbackCopy = () => {
+                const ta = document.createElement('textarea');
+                ta.value = shareText;
+                ta.setAttribute('readonly', '');
+                ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;font-size:16px;';
+                document.body.appendChild(ta);
+                ta.select();
+                ta.setSelectionRange(0, ta.value.length); // iOS Safari 需要
+                let ok = false;
+                try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+                document.body.removeChild(ta);
+                ok ? onSuccess() : onFail();
+            };
+
+            // 優先使用新版 Clipboard API（需 HTTPS 環境）
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(shareText).then(onSuccess).catch(fallbackCopy);
+            } else {
+                fallbackCopy();
+            }
         }
 
         function shareSocial(platform) {
